@@ -1,0 +1,3 @@
+﻿file,current_on_ADC_grid,grid_dev_mean,grid_dev_max,vib_decimal_places_mode,current_unique_ratio,current_min_step
+normal,False,0.2503601806872602,0.49999500877826364,6,0.9967,0.00010999999999228294
+outlier,True,1.2092038575567769e-05,4.9660559170661145e-05,8,0.5666666666666667,1.1920899999999506

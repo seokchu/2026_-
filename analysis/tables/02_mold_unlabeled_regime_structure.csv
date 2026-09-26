@@ -1,0 +1,3 @@
+﻿dataset,n,split_var,min_kurtosis,vars_with_kurt_below_neg1,cluster0,cluster1,vars_abs_sign_corr_gt_0p95,n_vars,interleaved_blocks_in_row_order,idx_min,idx_max,max_idx_gap,median_unique_values_per_var
+mold_unlab_cn7,35239,Cushion_Position,-1.9964616985416739,16,17977,17262,15,24,3449,114610,777220,181331,120.0
+mold_unlab_rg3,35941,Max_Injection_Speed,-1.8365400907978022,14,18426,17515,1,24,4616,119515,795309,169361,125.0

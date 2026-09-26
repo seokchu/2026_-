@@ -1,0 +1,62 @@
+﻿dataset,column,meaning,unit,evidence,note
+injection_molding,idx,행 번호 = 원본 통합파일의 shot 순번(추정),-,"값이 단조증가, cn7 0~1210 / rg3 1211~2392 로 연속",temporal proxy. 절대 시각 없음
+injection_molding,PassOrFail,품질 판정 0=양품 1=불량,binary,"값 {0,1}",unlabeled 파일에는 없음
+injection_molding,Injection_Time,"사출 공정 변수 (컬럼명 기반, 문서 없음)",z-score (무차원),파일별 mean=0 std=1,원단위 불명 → unknown/needs verification
+injection_molding,Filling_Time,"사출 공정 변수 (컬럼명 기반, 문서 없음)",z-score (무차원),파일별 mean=0 std=1,원단위 불명 → unknown/needs verification
+injection_molding,Plasticizing_Time,"사출 공정 변수 (컬럼명 기반, 문서 없음)",z-score (무차원),파일별 mean=0 std=1,원단위 불명 → unknown/needs verification
+injection_molding,Cycle_Time,"사출 공정 변수 (컬럼명 기반, 문서 없음)",z-score (무차원),파일별 mean=0 std=1,원단위 불명 → unknown/needs verification
+injection_molding,Clamp_Close_Time,"사출 공정 변수 (컬럼명 기반, 문서 없음)",z-score (무차원),파일별 mean=0 std=1,원단위 불명 → unknown/needs verification
+injection_molding,Cushion_Position,"사출 공정 변수 (컬럼명 기반, 문서 없음)",z-score (무차원),파일별 mean=0 std=1,원단위 불명 → unknown/needs verification
+injection_molding,Plasticizing_Position,"사출 공정 변수 (컬럼명 기반, 문서 없음)",z-score (무차원),파일별 mean=0 std=1,원단위 불명 → unknown/needs verification
+injection_molding,Clamp_Open_Position,"사출 공정 변수 (컬럼명 기반, 문서 없음)",z-score (무차원),파일별 mean=0 std=1,원단위 불명 → unknown/needs verification
+injection_molding,Max_Injection_Speed,"사출 공정 변수 (컬럼명 기반, 문서 없음)",z-score (무차원),파일별 mean=0 std=1,원단위 불명 → unknown/needs verification
+injection_molding,Max_Screw_RPM,"사출 공정 변수 (컬럼명 기반, 문서 없음)",z-score (무차원),파일별 mean=0 std=1,원단위 불명 → unknown/needs verification
+injection_molding,Average_Screw_RPM,"사출 공정 변수 (컬럼명 기반, 문서 없음)",z-score (무차원),파일별 mean=0 std=1,원단위 불명 → unknown/needs verification
+injection_molding,Max_Injection_Pressure,"사출 공정 변수 (컬럼명 기반, 문서 없음)",z-score (무차원),파일별 mean=0 std=1,원단위 불명 → unknown/needs verification
+injection_molding,Max_Switch_Over_Pressure,"사출 공정 변수 (컬럼명 기반, 문서 없음)",z-score (무차원),파일별 mean=0 std=1,원단위 불명 → unknown/needs verification
+injection_molding,Max_Back_Pressure,"사출 공정 변수 (컬럼명 기반, 문서 없음)",z-score (무차원),파일별 mean=0 std=1,원단위 불명 → unknown/needs verification
+injection_molding,Average_Back_Pressure,"사출 공정 변수 (컬럼명 기반, 문서 없음)",z-score (무차원),파일별 mean=0 std=1,원단위 불명 → unknown/needs verification
+injection_molding,Barrel_Temperature_1,"사출 공정 변수 (컬럼명 기반, 문서 없음)",z-score (무차원),파일별 mean=0 std=1,원단위 불명 → unknown/needs verification
+injection_molding,Barrel_Temperature_2,"사출 공정 변수 (컬럼명 기반, 문서 없음)",z-score (무차원),파일별 mean=0 std=1,원단위 불명 → unknown/needs verification
+injection_molding,Barrel_Temperature_3,"사출 공정 변수 (컬럼명 기반, 문서 없음)",z-score (무차원),파일별 mean=0 std=1,원단위 불명 → unknown/needs verification
+injection_molding,Barrel_Temperature_4,"사출 공정 변수 (컬럼명 기반, 문서 없음)",z-score (무차원),파일별 mean=0 std=1,원단위 불명 → unknown/needs verification
+injection_molding,Barrel_Temperature_5,"사출 공정 변수 (컬럼명 기반, 문서 없음)",z-score (무차원),파일별 mean=0 std=1,원단위 불명 → unknown/needs verification
+injection_molding,Barrel_Temperature_6,"사출 공정 변수 (컬럼명 기반, 문서 없음)",z-score (무차원),파일별 mean=0 std=1,원단위 불명 → unknown/needs verification
+injection_molding,Hopper_Temperature,"사출 공정 변수 (컬럼명 기반, 문서 없음)",z-score (무차원),파일별 mean=0 std=1,원단위 불명 → unknown/needs verification
+injection_molding,Mold_Temperature_3,"사출 공정 변수 (컬럼명 기반, 문서 없음)",z-score (무차원),파일별 mean=0 std=1,원단위 불명 → unknown/needs verification
+injection_molding,Mold_Temperature_4,"사출 공정 변수 (컬럼명 기반, 문서 없음)",z-score (무차원),파일별 mean=0 std=1,원단위 불명 → unknown/needs verification
+robot_welding,idx,생산순번,-,xlsx 'data set' 시트(공식 스키마),
+robot_welding,Machine_Name,생산설비,-,xlsx 'data set' 시트(공식 스키마),
+robot_welding,Item No,생산품목,-,xlsx 'data set' 시트(공식 스키마),
+robot_welding,working time,작업시간,-,xlsx 'data set' 시트(공식 스키마),
+robot_welding,Thickness 1(mm),소재 두께 1,0.3-2.3,xlsx 'data set' 시트(공식 스키마),
+robot_welding,Thickness 2(mm),소재 두께 2,0.3-2.3,xlsx 'data set' 시트(공식 스키마),
+robot_welding,weld force(bar),용접 가압력,1.00~12.00,xlsx 'data set' 시트(공식 스키마),
+robot_welding,weld current(kA),전류 ,12.00~18.00,xlsx 'data set' 시트(공식 스키마),
+robot_welding,weld Voltage(v),전압,1.50~3.50,xlsx 'data set' 시트(공식 스키마),
+robot_welding,weld time(ms),통전시간,30~120,xlsx 'data set' 시트(공식 스키마),
+robot_welding,defect,해당 일자·불량유형의 불량 '개수'(행 단위 아님),count,xlsx 'result' 시트,행 단위 라벨 아님 → 지도학습 불가
+robot_welding,defect type,1=파임불량 2=용접부족 3=크랙발생,code,xlsx 'result' 시트 Unnamed:6,
+hydraulic_press,TimeStamp,샘플 시각 (ms),datetime,0.1s 등간격 + 갭,
+hydraulic_press,AI0_Vibration,진동 채널 0,unknown (전압 추정),단위 문서 없음,
+hydraulic_press,AI1_Vibration,진동 채널 1,unknown,단위 문서 없음,
+hydraulic_press,AI2_Current,전류,"unknown (A 아님, ±270 범위)",정상파일은 주기 1.8s 정현파,
+hydraulic_press,Equipment_state,0=정상 1=이상,binary,파일 단위로 상수,
+power,날짜,측정 일자,YYYYMMDD,컬럼명 + 값 분포,
+power,시간,시(0-23),hour,컬럼명 + 값 분포,
+power,15분,해당 시의 15분 시점 전력,unknown(kW 추정),컬럼명 + 값 분포,문서 없음 → 단위 unknown
+power,30분,30분 시점 전력,unknown,컬럼명 + 값 분포,문서 없음 → 단위 unknown
+power,45분,45분 시점 전력,unknown,컬럼명 + 값 분포,문서 없음 → 단위 unknown
+power,60분,60분 시점 전력,unknown,컬럼명 + 값 분포,문서 없음 → 단위 unknown
+power,평균,4개 값의 평균(정수 반올림),unknown,컬럼명 + 값 분포,문서 없음 → 단위 unknown
+power,생산량,시간당 생산량,unknown(ea 추정),컬럼명 + 값 분포,문서 없음 → 단위 unknown
+power,기온,기온,degC,컬럼명 + 값 분포,
+power,풍속,풍속,m/s,컬럼명 + 값 분포,
+power,습도,상대습도,%,컬럼명 + 값 분포,
+power,강수량,강수량,mm,컬럼명 + 값 분포,
+power,전기요금(계절),계절별 요금 단가,KRW/kWh 추정,컬럼명 + 값 분포,
+power,day,요일 코드 1-7,code,컬럼명 + 값 분포,
+power,d,일,day,컬럼명 + 값 분포,
+power,m,월,month,컬럼명 + 값 분포,
+power,공장인원,"공장 인원(정규화 추정, float·max 48.4)",unknown,컬럼명 + 값 분포,문서 없음 → 단위 unknown
+power,인건비,"인건비 계수 {1.0,1.5}",unknown,컬럼명 + 값 분포,문서 없음 → 단위 unknown

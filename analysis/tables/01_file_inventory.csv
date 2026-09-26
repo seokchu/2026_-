@@ -1,0 +1,10 @@
+﻿key,path,bytes,md5_12
+mold_lab_cn7,1. 사출성형기 AI 데이터셋/moldset_labeled_cn7.csv,561704,a30e63fcd2b2
+mold_lab_rg3,1. 사출성형기 AI 데이터셋/moldset_labeled_rg3.csv,551941,93194d9ee2b9
+mold_unlab_cn7,1. 사출성형기 AI 데이터셋/moldset_unlabeled_cn7.csv,16643923,369dcec3ebfa
+mold_unlab_rg3,1. 사출성형기 AI 데이터셋/moldset_unlabeled_rg3.csv,16984495,a58b674ed54e
+weld_xlsx,2. 용접기 AI 데이터셋/Welding Data Set_01.xlsx,551445,eada1065accc
+weld_scaled,2. 용접기 AI 데이터셋/scaled_data.csv,639945,1d2bb59c2919
+press_normal,3. 소성가공 예지보전 AI 데이터셋/press_data_normal.csv,1211960,90bddc57753a
+press_outlier,3. 소성가공 예지보전 AI 데이터셋/outlier_data.csv,38823,d1b9c76943fd
+power,5. 자원 최적화 AI 데이터셋/okm_augumented_2021.csv,437447,da76729cd567

@@ -1,0 +1,3 @@
+﻿file,n,current_grid_mean_dev,current_grid_max_dev,on_grid,vib_decimals_mode,current_nuniq_ratio
+press_normal,20000,0.2503601806872602,0.49999500877826364,False,6,0.9967
+press_outlier,600,1.2092038575567769e-05,4.9660559170661145e-05,True,8,0.5666666666666667

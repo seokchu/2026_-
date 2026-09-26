@@ -1,0 +1,16 @@
+|--- Plasticizing_Position <= 1.441
+|   |--- Hopper_Temperature <= -1.227
+|   |   |--- class: 0
+|   |--- Hopper_Temperature >  -1.227
+|   |   |--- class: 0
+|--- Plasticizing_Position >  1.441
+|   |--- Clamp_Close_Time <= 0.038
+|   |   |--- Plasticizing_Time <= -0.552
+|   |   |   |--- class: 0
+|   |   |--- Plasticizing_Time >  -0.552
+|   |   |   |--- class: 0
+|   |--- Clamp_Close_Time >  0.038
+|   |   |--- Hopper_Temperature <= -1.126
+|   |   |   |--- class: 0
+|   |   |--- Hopper_Temperature >  -1.126
+|   |   |   |--- class: 1

@@ -1,0 +1,2 @@
+﻿raw_rows,raw_days,machines,items,thickness_combos,result_rows,result_days,defect_types,total_defects,row_level_labels_available,raw_days_without_label,unique_process_combos,duplicate_row_fraction
+11939,9,1,1,1,23,8,3,39,False,2020-03-27,1574,0.8681631627439484

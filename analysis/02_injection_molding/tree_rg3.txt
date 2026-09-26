@@ -1,0 +1,10 @@
+|--- Average_Back_Pressure <= -1.191
+|   |--- class: 0
+|--- Average_Back_Pressure >  -1.191
+|   |--- Barrel_Temperature_3 <= 1.381
+|   |   |--- Barrel_Temperature_5 <= -0.814
+|   |   |   |--- class: 0
+|   |   |--- Barrel_Temperature_5 >  -0.814
+|   |   |   |--- class: 1
+|   |--- Barrel_Temperature_3 >  1.381
+|   |   |--- class: 0

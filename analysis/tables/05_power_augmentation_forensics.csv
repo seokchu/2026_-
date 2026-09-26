@@ -1,0 +1,2 @@
+﻿total_days,unique_power_profiles,duplicated_days,multi_day_groups,groups_sharing_same_day_of_month,largest_group_size,clean_window_start,clean_window_days,clean_window_dup_rate,within_identical_power_group_production_CV_median,within_identical_power_group_production_CV_max
+257,142,160,45,24,15,2021-07-01,76,0.02631578947368421,0.16244552386201394,1.5408635577162082

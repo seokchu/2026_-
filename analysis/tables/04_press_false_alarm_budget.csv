@@ -1,0 +1,3 @@
+﻿score,threshold_at_1pct_FA_on_normal,recall_on_outlier,false_alarm_rate_on_normal,n_false_alarm_windows,auc
+iso_score,0.5485843504261206,1.0,0.010570824524312896,5,0.9996979764421624
+maha,140.22544257127046,1.0,0.010570824524312896,5,1.0

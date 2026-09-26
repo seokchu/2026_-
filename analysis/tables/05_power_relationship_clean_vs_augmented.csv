@@ -1,0 +1,11 @@
+﻿window,feature,n,spearman_with_kw
+augmented_Jan_Jun,생산량,17376,0.6963919810082714
+augmented_Jan_Jun,기온,17376,0.09342565957694661
+augmented_Jan_Jun,공장인원,17376,0.6495387118964819
+augmented_Jan_Jun,습도,17376,-0.11449742924206265
+augmented_Jan_Jun,풍속,17368,0.1411245384590637
+clean_Jul_Sep,생산량,7296,0.8284245145792398
+clean_Jul_Sep,기온,7296,0.03906579186035323
+clean_Jul_Sep,공장인원,7228,0.8012088533973674
+clean_Jul_Sep,습도,7296,-0.14175479057245977
+clean_Jul_Sep,풍속,7292,0.10757979495650832
