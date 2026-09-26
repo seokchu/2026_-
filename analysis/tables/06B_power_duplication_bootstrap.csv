@@ -1,0 +1,4 @@
+﻿variant,model,mean_abs_err_diff_vs_raw_all,ci_lo,ci_hi,better_than_raw_all,worse_than_raw_all
+dedup,hgb,0.033848685467588846,-0.08351294556911378,0.15321244646222734,False,False
+inv_dup_wgt,hgb,-0.013608910742534666,-0.13339893314779266,0.0982694451373599,False,False
+clean_only,hgb,0.4370045617072476,0.23658575084595226,0.6482534872217073,False,True

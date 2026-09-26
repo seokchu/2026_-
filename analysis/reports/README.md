@@ -20,6 +20,9 @@ analysis/
                     leak_removed.py  누출 제거 후 공정 재측정 (부록 A)
   05_power/analyze.py             전력: 증강진단·피크정의·이벤트해부·원형군집·베이스라인·효율프런티어·전조
            clean_window.py        원본 76일 재검증 (부록 A)
+  06_followup/A_state_split_regression.py  조업/비조업 분리 3모델 비교 + paired bootstrap
+              B_duplication_handling.py    복제 처리 4방식 비교 (동일 원본 테스트셋)
+              C_conformal_exceedance.py    QR/CQR coverage + 경보 운용곡선
   tables/    62개 CSV (utf-8-sig)
   figures/   6개 PNG
   reports/   본 보고서들 + ENVIRONMENT.txt
