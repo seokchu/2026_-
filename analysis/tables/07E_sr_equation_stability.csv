@@ -1,0 +1,5 @@
+﻿train_folds,program,length,spearman_on_fold4
+<2,"add(sqrt(sqrt(X0)), sqrt(sqrt(X0)))",7,0.4720755458018688
+<3,"sqrt(add(sqrt(X6), add(sqrt(X10), sqrt(X10))))",9,0.4336059516345381
+<4,"sqrt(add(add(sqrt(X6), sqrt(X0)), sqrt(X0)))",9,0.46113036380461186
+<=3(main),"sqrt(add(add(sqrt(X6), sqrt(X0)), sqrt(X0)))",9,0.46113036380461186

@@ -8,3 +8,8 @@
 __pycache__/
 *.pyc
 .ipynb_checkpoints/
+
+# 07 단계 중간 캐시 — 원본 관측값을 행 단위로 담으므로 커밋하지 않는다(재실행으로 재생성).
+analysis/tables/07C_oof_predictions.csv
+analysis/tables/07D_latent_state_features.csv
+analysis/tables/07F_row_scores.csv

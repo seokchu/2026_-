@@ -1,0 +1,2 @@
+﻿best_error_model,spearman_by_signal,monotonic_mae,mae_low_over_high,ood_cut_maha,high_err_threshold_kw,band_cuts
+int_width,"{'ridge': 0.014, 'tree_depth3': 0.096, 'hgb': 0.318, 'int_width': 0.559}",True,3.986376018211218,49.407243741226836,14.356050748721133,"[np.float64(45.427), np.float64(67.438)]"

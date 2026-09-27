@@ -1,0 +1,2 @@
+﻿sr_auc_high_error,best_non_sr_auc,free_baseline_int_width_auc,sr_within_0_02_of_best,disagreement_auc_high_error,disagreement_useful,disagreement_beats_free_baseline,equation_stable_across_folds,n_distinct_programs,decision
+0.6147244984873852,0.6815419371261295,0.7334211531118747,False,0.7241989015184891,True,False,True,3,OPTIONAL

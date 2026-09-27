@@ -1,0 +1,35 @@
+﻿variable,group,available_at_t,known_future_schedule,observed_only_after_event,safe_for_h1_h4,note
+kw,power_history,True,False,False,True,t 시점까지의 집계 수요만 사용
+kw_lag1,power_history,True,False,False,True,t 시점까지의 집계 수요만 사용
+kw_lag2,power_history,True,False,False,True,t 시점까지의 집계 수요만 사용
+kw_lag3,power_history,True,False,False,True,t 시점까지의 집계 수요만 사용
+kw_lag4,power_history,True,False,False,True,t 시점까지의 집계 수요만 사용
+kw_lag8,power_history,True,False,False,True,t 시점까지의 집계 수요만 사용
+kw_lag96,power_history,True,False,False,True,t 시점까지의 집계 수요만 사용
+kw_roll4,power_history,True,False,False,True,t 시점까지의 집계 수요만 사용
+kw_roll96,power_history,True,False,False,True,t 시점까지의 집계 수요만 사용
+kw_diff1,power_history,True,False,False,True,t 시점까지의 집계 수요만 사용
+kw_ramp4,power_history,True,False,False,True,t 시점까지의 집계 수요만 사용
+kw_std4,power_history,True,False,False,True,t 시점까지의 집계 수요만 사용
+kw_std96,power_history,True,False,False,True,t 시점까지의 집계 수요만 사용
+kw_max96,power_history,True,False,False,True,t 시점까지의 집계 수요만 사용
+시간,calendar,True,True,False,True,달력/계절요금 — 사전 확정
+qi,calendar,True,True,False,True,달력/계절요금 — 사전 확정
+tod,calendar,True,True,False,True,달력/계절요금 — 사전 확정
+day,calendar,True,True,False,True,달력/계절요금 — 사전 확정
+m,calendar,True,True,False,True,달력/계절요금 — 사전 확정
+d,calendar,True,True,False,True,달력/계절요금 — 사전 확정
+is_weekend,calendar,True,True,False,True,달력/계절요금 — 사전 확정
+전기요금(계절),calendar,True,True,False,True,달력/계절요금 — 사전 확정
+기온,weather,True,False,False,True,t 시점 관측값만 사용(예보 미사용)
+습도,weather,True,False,False,True,t 시점 관측값만 사용(예보 미사용)
+풍속,weather,True,False,False,True,t 시점 관측값만 사용(예보 미사용)
+강수량,weather,True,False,False,True,t 시점 관측값만 사용(예보 미사용)
+생산량,production,True,가정,False,가정부,ERP 시간 집계. 생산계획으로 사전 확정 가정에서만 안전 → L3s 로 민감도 확인
+prod_lag4,production,True,False,False,True,1시간 전 생산량 — 무조건 안전
+prod_diff,production,True,가정,False,가정부,생산량(t) - prod_lag4
+is_operating,production,True,가정,False,가정부,생산량(t)>0
+is_operating_lag4,production,True,False,False,True,1시간 전 조업 여부
+평균,EXCLUDED,True,False,True,False,같은 시간 4개 분값의 평균 = 타깃 포함(누수)
+공장인원,EXCLUDED,True,False,False,False,생산량과 spearman 0.994 중복
+인건비,EXCLUDED,True,False,False,False,"고유값 2개, 사실상 상수"
