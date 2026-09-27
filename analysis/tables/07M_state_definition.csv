@@ -1,0 +1,2 @@
+﻿ramp_cut_kw,n_pre_rows,definition
+48.0,4196,transition = 조업여부 1시간내 변화 or |kw_ramp4|>=train p90

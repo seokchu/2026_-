@@ -3,15 +3,16 @@
 목적: **주제 선정 전 근거 축적.** 최종 주제는 선정하지 않았다.
 
 ## 읽는 순서
-0. `15_FINAL_DIRECTION_RECOMMENDATION.md` — **증거 기반 최종 방향 권고 15문 직답** (07 Sparse-FEMS 단계 결론)
-1. `07_DISCOVERY_SUMMARY.md` — 전체 종합 + 부록의 정정 사항 (EDA 단계 종합)
-2. `06_CROSS_DATASET_비교.md` — 4개 데이터셋 횡단 비교, 미해결 질문
-3. `05_IDEA_INGREDIENT_BANK.md` — 조합 가능한 재료 목록(주제 아님)
-4. Sparse-FEMS 단계: `10_SPARSE_FEMS_INFORMATION_ABLATION.md`, `11_HARD_CONDITION_MAP.md`,
+0. `16_조건부보정_피크정의_다중horizon_3상태.md` — **2단계 검증**(Mondrian conformal / 피크 정의 통일 / 다중 horizon 경보 / 3상태). 피크 임계 정의가 여기서 확정된다
+1. `15_FINAL_DIRECTION_RECOMMENDATION.md` — **증거 기반 최종 방향 권고 15문 직답** (07 Sparse-FEMS 단계 결론)
+2. `07_DISCOVERY_SUMMARY.md` — 전체 종합 + 부록의 정정 사항 (EDA 단계 종합)
+3. `06_CROSS_DATASET_비교.md` — 4개 데이터셋 횡단 비교, 미해결 질문
+4. `05_IDEA_INGREDIENT_BANK.md` — 조합 가능한 재료 목록(주제 아님)
+5. Sparse-FEMS 단계: `10_SPARSE_FEMS_INFORMATION_ABLATION.md`, `11_HARD_CONDITION_MAP.md`,
    `12_NILM_SR_FEASIBILITY.md`, `13_RELIABILITY_AND_DECISION_POLICY.md`, `14_PROGRESSIVE_INSTRUMENTATION.md`
-   / 상태판: `analysis/state/hypothesis_ledger.csv`(가설 12건), `analysis/state/evidence_registry.csv`(근거 24건)
-5. 후속검증/문서조사: `08_후속검증_A_B_C.md`, `09_KAMP_공식문서_조사.md`
-6. 개별 보고서: `01_사출성형_보고서.md`, `02_용접_보고서.md`, `03_프레스유압_보고서.md`(부록 A 정정 포함), `04_전력_보고서.md`(부록 A 정정 포함)
+   / 상태판: `analysis/state/hypothesis_ledger.csv`(가설 16건), `analysis/state/evidence_registry.csv`(근거 32건)
+6. 후속검증/문서조사: `08_후속검증_A_B_C.md`, `09_KAMP_공식문서_조사.md`
+7. 개별 보고서: `01_사출성형_보고서.md`, `02_용접_보고서.md`, `03_프레스유압_보고서.md`(부록 A 정정 포함), `04_전력_보고서.md`(부록 A 정정 포함)
 
 ## 디렉터리
 ```
@@ -28,7 +29,7 @@ analysis/
   06_followup/A_state_split_regression.py  조업/비조업 분리 3모델 비교 + paired bootstrap
               B_duplication_handling.py    복제 처리 4방식 비교 (동일 원본 테스트셋)
               C_conformal_exceedance.py    QR/CQR coverage + 경보 운용곡선
-  07_sparse_fems/                 저계측 FEMS 검증 (Task A~I). run_all.py 로 일괄 재현
+  07_sparse_fems/                 저계측 FEMS 검증 (Task A~I) + 2단계(J~M). run_all.py 로 일괄 재현
       _fe.py                      공통 특성/정보수준/분할/지표/bootstrap
       feature_availability.py     특성 가용성 감사 + 누수 실증('평균' 열 적발)
       multi_horizon_baseline.py   t+15/30/45/60분 x persistence/Ridge/RF/HGB
@@ -40,6 +41,10 @@ analysis/
       confidence_gate.py          신뢰도 x 피크위험 등급 정책 운용곡선
       cost_aware_alert.py         FP/FN 비용비별 최적 경보 임계
       value_of_information.py     정보군 한계가치 / 최소 정보집합
+      mondrian_conformal.py       조건부(그룹별) conformal 보정 — 피크 coverage 검증
+      peak_definition.py          피크 임계 정의 6종 비교 + 통일 권고
+      multihorizon_alert.py       15/30/45/60분 경보 정책 (이벤트 포착률·선행시간)
+      three_state.py              정지/전환/정상조업 3상태 검증
   state/     analysis_state.md, hypothesis_ledger.csv, evidence_registry.csv
   (중간 캐시 07C_oof_predictions / 07D_latent_state_features / 07F_row_scores 는 원본 관측값을
    행 단위로 담으므로 .gitignore 처리. run_all.py 재실행으로 재생성된다.)
@@ -61,7 +66,7 @@ python3 05_power/clean_window.py
 python3 06_followup/A_state_split_regression.py
 python3 06_followup/B_duplication_handling.py
 python3 06_followup/C_conformal_exceedance.py
-python3 07_sparse_fems/run_all.py      # Task A~I 일괄 (M1 기준 약 12분)
+python3 07_sparse_fems/run_all.py      # Task A~I + 2단계 J~M 일괄 (M1 기준 약 15분)
 ```
 전부 CPU 단독, M1 MacBook Air 기준 총 3분 이내. GPU 불필요.
 
@@ -70,6 +75,9 @@ python3 07_sparse_fems/run_all.py      # Task A~I 일괄 (M1 기준 약 12분)
 - **라이브러리 버전**: `reports/ENVIRONMENT.txt` 참조 (python 3.9.6 / pandas 2.3.3 / numpy 2.0.2 / scipy 1.13.1 / scikit-learn 1.6.1 / matplotlib 3.9.4 / openpyxl 3.1.5)
 - **한글 그림 폰트**: AppleGothic (`common.mpl()`)
 - **추가 설치**: `openpyxl` (xlsx 읽기), `gplearn` 0.4.2 (Symbolic Regression), `hmmlearn` 0.3.3 (잠재문맥)
+- 2단계(J~M) 런타임: mondrian 152.7s / peak_definition 3.2s / multihorizon_alert 21.3s / three_state 13.8s
+- **피크 임계 정의(확정)**: `p95_trailing_30d` — 직전 30일 p95, 적응형·leak-free (근거 `07K_peak_definitions.csv`).
+  08/13 보고서의 기존 수치는 각자의 정의(전체구간 p95 / 첫 폴드 p95)를 병기한 채 보존한다.
 - 07 단계 seed 동일(20260926). 사용처 추가: HistGradientBoosting(회귀/분위/분류), RandomForest,
   TimeSeriesSplit(비랜덤), GaussianHMM/GaussianMixture/NMF, SymbolicRegressor, paired bootstrap 2,000회
 

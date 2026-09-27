@@ -1,0 +1,5 @@
+﻿window,variant,vs,delta,ci_lo,ci_hi,significant,improves
+all_2021,state2_specific,global,0.03487178472187271,-0.16346985673900566,0.2261000261424118,False,False
+all_2021,state3_specific,global,-0.09556991745850074,-0.294795498412056,0.10514614103007136,False,False
+clean_Jul_Sep,state2_specific,global,-0.24295054688615356,-0.6264749858799441,0.07854256176174977,False,False
+clean_Jul_Sep,state3_specific,global,0.023467590142779663,-0.33238301399545717,0.33409341671860404,False,False

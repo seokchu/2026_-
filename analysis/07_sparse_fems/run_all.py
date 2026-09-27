@@ -5,7 +5,9 @@ HERE = Path(__file__).resolve().parent
 STEPS = ["feature_availability.py", "multi_horizon_baseline.py", "latent_context.py",
          "information_ablation.py", "hard_condition_discovery.py", "symbolic_reliability.py",
          "reliability_meta.py", "confidence_gate.py", "cost_aware_alert.py",
-         "value_of_information.py"]
+         "value_of_information.py",
+         # 2단계 (미수행 1~4 검증)
+         "mondrian_conformal.py", "peak_definition.py", "multihorizon_alert.py", "three_state.py"]
 if __name__ == "__main__":
     for s in STEPS:
         t = time.time()
