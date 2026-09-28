@@ -3,16 +3,17 @@
 목적: **주제 선정 전 근거 축적.** 최종 주제는 선정하지 않았다.
 
 ## 읽는 순서
-0. `16_조건부보정_피크정의_다중horizon_3상태.md` — **2단계 검증**(Mondrian conformal / 피크 정의 통일 / 다중 horizon 경보 / 3상태). 피크 임계 정의가 여기서 확정된다
-1. `15_FINAL_DIRECTION_RECOMMENDATION.md` — **증거 기반 최종 방향 권고 15문 직답** (07 Sparse-FEMS 단계 결론)
-2. `07_DISCOVERY_SUMMARY.md` — 전체 종합 + 부록의 정정 사항 (EDA 단계 종합)
-3. `06_CROSS_DATASET_비교.md` — 4개 데이터셋 횡단 비교, 미해결 질문
-4. `05_IDEA_INGREDIENT_BANK.md` — 조합 가능한 재료 목록(주제 아님)
-5. Sparse-FEMS 단계: `10_SPARSE_FEMS_INFORMATION_ABLATION.md`, `11_HARD_CONDITION_MAP.md`,
+0. `17_국내_저계측_제조환경_실무근거.md` — **도입부용 Problem Validity 자료**(국내 저계측 제조현황 공식통계 / 외부데이터 질문 방어논리 / 안전한 주장·금지 주장)
+1. `16_조건부보정_피크정의_다중horizon_3상태.md` — **2단계 검증**(Mondrian conformal / 피크 정의 통일 / 다중 horizon 경보 / 3상태). 피크 임계 정의가 여기서 확정된다
+2. `15_FINAL_DIRECTION_RECOMMENDATION.md` — **증거 기반 최종 방향 권고 15문 직답** (07 Sparse-FEMS 단계 결론)
+3. `07_DISCOVERY_SUMMARY.md` — 전체 종합 + 부록의 정정 사항 (EDA 단계 종합)
+4. `06_CROSS_DATASET_비교.md` — 4개 데이터셋 횡단 비교, 미해결 질문
+5. `05_IDEA_INGREDIENT_BANK.md` — 조합 가능한 재료 목록(주제 아님)
+6. Sparse-FEMS 단계: `10_SPARSE_FEMS_INFORMATION_ABLATION.md`, `11_HARD_CONDITION_MAP.md`,
    `12_NILM_SR_FEASIBILITY.md`, `13_RELIABILITY_AND_DECISION_POLICY.md`, `14_PROGRESSIVE_INSTRUMENTATION.md`
    / 상태판: `analysis/state/hypothesis_ledger.csv`(가설 16건), `analysis/state/evidence_registry.csv`(근거 32건)
-6. 후속검증/문서조사: `08_후속검증_A_B_C.md`, `09_KAMP_공식문서_조사.md`
-7. 개별 보고서: `01_사출성형_보고서.md`, `02_용접_보고서.md`, `03_프레스유압_보고서.md`(부록 A 정정 포함), `04_전력_보고서.md`(부록 A 정정 포함)
+7. 후속검증/문서조사: `08_후속검증_A_B_C.md`, `09_KAMP_공식문서_조사.md`
+8. 개별 보고서: `01_사출성형_보고서.md`, `02_용접_보고서.md`, `03_프레스유압_보고서.md`(부록 A 정정 포함), `04_전력_보고서.md`(부록 A 정정 포함)
 
 ## 디렉터리
 ```
