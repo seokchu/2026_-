@@ -1,0 +1,5 @@
+﻿definition,n_states,has_low_load_regime,has_stable_run_regime,has_transition_like_regime,three_structure_present,max_ramp_state,max_ramp_state_mae,overall_mae,max_ramp_state_mae_ratio,max_ramp_state_peak_prevalence,max_ramp_state_low_or_ood,verdict,mean_pairwise_ari
+A_rule_ramp,3,True,True,True,True,transition,9.922130902579648,9.453660294982898,1.0495544152189782,0.10879190385831752,0.35989879822896903,YES_데이터기반 3레짐 구조 반복,0.44092899352513776
+B_changepoint,3,True,True,True,True,transition,10.327582523420535,9.453660294982898,1.0924427365875873,0.2091469681397739,0.4578622816032888,YES_데이터기반 3레짐 구조 반복,0.44092899352513776
+C_gmm3,3,True,True,True,True,transition,10.73950162088478,9.453660294982898,1.1360151820331734,0.15607026270791233,0.33219337789522774,YES_데이터기반 3레짐 구조 반복,0.44092899352513776
+D_hmm3_latent,3,True,True,True,True,hmm_2,10.427718524274598,9.453660294982898,1.1030350360493317,0.10722204624643648,0.2939499524865379,YES_데이터기반 3레짐 구조 반복,0.44092899352513776

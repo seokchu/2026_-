@@ -1,0 +1,2 @@
+﻿decision,mae_gain_pct_h60,low_or_ood_reduction_pct,peak_coverage_gain,transition_mae_reduction_pct,tree_promoted_conditions_E0,tree_promoted_conditions_E3,hard_conditions_gone,rule
+"CASE2_부분 개선, 신뢰도/난조건 문제 잔존",0.06356106448980574,0.004872107186358089,-0.021479713603818618,-0.0037789778958958443,2,1,0,CASE1: LOW/OOD -50% 이상 & 피크 coverage +0.05 이상 & 전환 MAE -20% 이상 / CASE2: MAE -2% 또는 LOW/OOD -10% 또는 전환 MAE -5% / CASE3: 그 미만

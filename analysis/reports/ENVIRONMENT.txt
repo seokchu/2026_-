@@ -11,3 +11,7 @@ matplotlib 3.9.4
 openpyxl 3.1.5
 gplearn 0.4.2
 hmmlearn 0.3.3
+
+# 3단계(N~Q) 추가
+holidays 0.83
+외부데이터: NOAA NCEI ISD global-hourly (무인증 HTTPS, 2026-09-28 취득)

@@ -11,7 +11,9 @@
 5. `05_IDEA_INGREDIENT_BANK.md` — 조합 가능한 재료 목록(주제 아님)
 6. Sparse-FEMS 단계: `10_SPARSE_FEMS_INFORMATION_ABLATION.md`, `11_HARD_CONDITION_MAP.md`,
    `12_NILM_SR_FEASIBILITY.md`, `13_RELIABILITY_AND_DECISION_POLICY.md`, `14_PROGRESSIVE_INSTRUMENTATION.md`
-   / 상태판: `analysis/state/hypothesis_ledger.csv`(가설 16건), `analysis/state/evidence_registry.csv`(근거 32건)
+   / 상태판: `analysis/state/hypothesis_ledger.csv`(가설 20건), `analysis/state/evidence_registry.csv`(근거 40건)
+7. 3단계(외부데이터·운영정책): `18_EXTERNAL_DATA_STRESS_TEST.md`, `19_COST_MULTI_HORIZON_POLICY.md`,
+   `20_THREE_STATE_ROBUSTNESS.md`, `21_OPERATOR_DIAGNOSTIC_LAYER.md` / 문제타당성: `17_국내_저계측_제조환경_실무근거.md`
 7. 후속검증/문서조사: `08_후속검증_A_B_C.md`, `09_KAMP_공식문서_조사.md`
 8. 개별 보고서: `01_사출성형_보고서.md`, `02_용접_보고서.md`, `03_프레스유압_보고서.md`(부록 A 정정 포함), `04_전력_보고서.md`(부록 A 정정 포함)
 
@@ -30,7 +32,7 @@ analysis/
   06_followup/A_state_split_regression.py  조업/비조업 분리 3모델 비교 + paired bootstrap
               B_duplication_handling.py    복제 처리 4방식 비교 (동일 원본 테스트셋)
               C_conformal_exceedance.py    QR/CQR coverage + 경보 운용곡선
-  07_sparse_fems/                 저계측 FEMS 검증 (Task A~I) + 2단계(J~M). run_all.py 로 일괄 재현
+  07_sparse_fems/                 저계측 FEMS 검증 (Task A~I) + 2단계(J~M) + 3단계(N~Q). run_all.py 로 일괄 재현
       _fe.py                      공통 특성/정보수준/분할/지표/bootstrap
       feature_availability.py     특성 가용성 감사 + 누수 실증('평균' 열 적발)
       multi_horizon_baseline.py   t+15/30/45/60분 x persistence/Ridge/RF/HGB
@@ -46,8 +48,13 @@ analysis/
       peak_definition.py          피크 임계 정의 6종 비교 + 통일 권고
       multihorizon_alert.py       15/30/45/60분 경보 정책 (이벤트 포착률·선행시간)
       three_state.py              정지/전환/정상조업 3상태 검증
+      fetch_external.py           외부 공공데이터 수집·캐싱(공휴일/NOAA ISD/태양기하/요금 시간대)
+      external_data_stress_test.py 외부데이터 E0~E3 ablation + CASE 판정
+      integrated_alert_policy.py  비용 x 다중 horizon 통합 경보 정책 스윕
+      three_state_robustness.py   3레짐 구조의 정의 독립성(규칙/변화점/GMM/HMM)
+      operator_diagnostic.py      작업자 진단 계층 + 정보부족 플래그 검증
   state/     analysis_state.md, hypothesis_ledger.csv, evidence_registry.csv
-  (중간 캐시 07C_oof_predictions / 07D_latent_state_features / 07F_row_scores 는 원본 관측값을
+  (중간 캐시 07C_oof_predictions / 07D_latent_state_features / 07F_row_scores / 07O_policy_rows 는 원본 관측값을
    행 단위로 담으므로 .gitignore 처리. run_all.py 재실행으로 재생성된다.)
   tables/    CSV (utf-8-sig)
   figures/   PNG
@@ -67,7 +74,7 @@ python3 05_power/clean_window.py
 python3 06_followup/A_state_split_regression.py
 python3 06_followup/B_duplication_handling.py
 python3 06_followup/C_conformal_exceedance.py
-python3 07_sparse_fems/run_all.py      # Task A~I + 2단계 J~M 일괄 (M1 기준 약 15분)
+python3 07_sparse_fems/run_all.py      # Task A~I + J~M + N~Q 일괄 (M1 기준 약 25분, 외부데이터 최초 1회 다운로드 포함)
 ```
 전부 CPU 단독, M1 MacBook Air 기준 총 3분 이내. GPU 불필요.
 
@@ -76,6 +83,13 @@ python3 07_sparse_fems/run_all.py      # Task A~I + 2단계 J~M 일괄 (M1 기�
 - **라이브러리 버전**: `reports/ENVIRONMENT.txt` 참조 (python 3.9.6 / pandas 2.3.3 / numpy 2.0.2 / scipy 1.13.1 / scikit-learn 1.6.1 / matplotlib 3.9.4 / openpyxl 3.1.5)
 - **한글 그림 폰트**: AppleGothic (`common.mpl()`)
 - **추가 설치**: `openpyxl` (xlsx 읽기), `gplearn` 0.4.2 (Symbolic Regression), `hmmlearn` 0.3.3 (잠재문맥)
+- 3단계(N~Q) 런타임(캐시 있음): fetch_external 1.4s / external_data_stress_test 88.2s /
+  integrated_alert_policy 37.7s / three_state_robustness 2.1s / operator_diagnostic 1.4s
+  (fetch_external 최초 실행은 NOAA ISD 10개 관측소 다운로드로 약 60초, 캐시 19MB)
+- **외부데이터**: 공휴일(python holidays, MIT), NOAA NCEI ISD global-hourly(미국 정부 공개), 태양기하(계산),
+  한전 산업용 시간대 구분(구조만). 출처·라이선스·가용성 전체는 `analysis/tables/07N_external_data_sources.csv`.
+  원본 캐시 `analysis/external_cache/` 는 커밋하지 않는다(재다운로드 가능).
+- **추가 설치**: `holidays` 0.83 (공휴일 달력)
 - 2단계(J~M) 런타임: mondrian 152.7s / peak_definition 3.2s / multihorizon_alert 21.3s / three_state 13.8s
 - **피크 임계 정의(확정)**: `p95_trailing_30d` — 직전 30일 p95, 적응형·leak-free (근거 `07K_peak_definitions.csv`).
   08/13 보고서의 기존 수치는 각자의 정의(전체구간 p95 / 첫 폴드 p95)를 병기한 채 보존한다.

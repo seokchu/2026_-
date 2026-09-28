@@ -1,0 +1,2 @@
+﻿hourly_rows_observed,hourly_grid_rows,missing_share_before_ffill,missing_share_after_ffill,ffill_limit_hours,note
+5325,8760,0.40223919915700745,0.01697400772743238,6,ffill 은 과거 관측만 사용. 6시간 초과 공백은 결측 유지

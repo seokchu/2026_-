@@ -13,3 +13,8 @@ __pycache__/
 analysis/tables/07C_oof_predictions.csv
 analysis/tables/07D_latent_state_features.csv
 analysis/tables/07F_row_scores.csv
+analysis/tables/07O_policy_rows.csv
+
+# 외부데이터 원본 캐시 — NOAA ISD 원본은 재다운로드 가능하므로 커밋하지 않는다.
+analysis/external_cache/
+analysis/tables/07N_external_solar_tariff_2021.csv

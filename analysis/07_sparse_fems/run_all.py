@@ -7,7 +7,10 @@ STEPS = ["feature_availability.py", "multi_horizon_baseline.py", "latent_context
          "reliability_meta.py", "confidence_gate.py", "cost_aware_alert.py",
          "value_of_information.py",
          # 2단계 (미수행 1~4 검증)
-         "mondrian_conformal.py", "peak_definition.py", "multihorizon_alert.py", "three_state.py"]
+         "mondrian_conformal.py", "peak_definition.py", "multihorizon_alert.py", "three_state.py",
+         # 3단계 (외부데이터·통합경보·3레짐 견고성·작업자 진단)
+         "fetch_external.py", "external_data_stress_test.py", "integrated_alert_policy.py",
+         "three_state_robustness.py", "operator_diagnostic.py"]
 if __name__ == "__main__":
     for s in STEPS:
         t = time.time()
