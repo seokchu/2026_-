@@ -3,7 +3,9 @@
 목적: EDA·주제검증부터 최종 Baseline v1.1 및 제출 준비까지의 근거·재현 산출물을 관리한다.
 
 ## 읽는 순서
-0. `23_FINAL_BASELINE_V1.md` — **최종 Baseline v1.1**(단일 재현 파이프라인 / 성능·신뢰도·경보·파레토·정보부족 진단 / 코드 감사 결과). 여기부터 읽는다
+0. `29_FINAL_SUBMISSION_REPORT.md` — **제출용 최종 결과보고서**(문제→데이터→모델→확률·신뢰도→경보→오류조건→현장→한계)
+0-0. `28_REVIEW_R1_RESPONSE.md` — **1차 모의평가 대응**(순차경보 재구현 / 정책선택 누수 제거 / 보정 확률 / FP·FN 조건, **철회된 주장 포함**)
+0-1. `23_FINAL_BASELINE_V1.md` — **최종 Baseline v1.1**(단일 재현 파이프라인 / 성능·신뢰도·경보·파레토·정보부족 진단 / 코드 감사 결과). 여기부터 읽는다
 0-1. `24_BASELINE_V1_FOLLOWUP.md` — 후속 검증(조건부 conformal 채택 / 비용 단위 환산 / 채널 가치 **음성** / 타 공장 전이 **음성**)
 0-2. `25_PRESENTATION_OUTLINE.md` — 발표 구성안 12슬라이드 + 금지 주장 목록
 0-3. `26_OFFICIAL_TASK_HORIZON_VERIFICATION.md` — **공식 예측 정의 검증**(가이드북 next-step 예측 근거 / day-ahead 96-step 오해 정리 / 현행 h15~h60 유지 판정)
@@ -17,7 +19,7 @@
 7. `05_IDEA_INGREDIENT_BANK.md` — 조합 가능한 재료 목록(주제 아님)
 8. Sparse-FEMS 단계: `10_SPARSE_FEMS_INFORMATION_ABLATION.md`, `11_HARD_CONDITION_MAP.md`,
    `12_NILM_SR_FEASIBILITY.md`, `13_RELIABILITY_AND_DECISION_POLICY.md`, `14_PROGRESSIVE_INSTRUMENTATION.md`
-   / 상태판: `analysis/state/hypothesis_ledger.csv`(가설 25건), `analysis/state/evidence_registry.csv`(근거 52건)
+   / 상태판: `analysis/state/hypothesis_ledger.csv`(가설 28건), `analysis/state/evidence_registry.csv`(근거 58건)
 9. 3단계(외부데이터·운영정책): `18_EXTERNAL_DATA_STRESS_TEST.md`, `19_COST_MULTI_HORIZON_POLICY.md`,
    `20_THREE_STATE_ROBUSTNESS.md`, `21_OPERATOR_DIAGNOSTIC_LAYER.md` / 문제타당성: `17_국내_저계측_제조환경_실무근거.md`
 10. 후속검증/문서조사: `08_후속검증_A_B_C.md`, `09_KAMP_공식문서_조사.md`
@@ -69,7 +71,7 @@ analysis/
       report.py                   통합 지표표 + 그림 6종 + baseline_summary.json
       run_baseline.py             단일 진입점 (--no-external / --quick)
       inference.py                배포 산출물 로딩 + 다음 시점 추론
-      test_baseline.py            수용 테스트 18항 (누수/정렬/임계/금지문구/재현성/평가-배포 정합성)
+      test_baseline.py            수용 테스트 24항 (누수/정렬/임계/금지문구/재현성/평가-배포 정합성/목표시각·정책선택 분리/확률 보정)
       followup_mondrian.py        조건부(Mondrian) conformal — 피크구간 coverage 개선 검증 (v1.1 채택 근거)
       followup_cost_units.py      비용비 -> 실제 단위 환산(측정 ΔkW + 파라미터 시나리오)
       followup_added_channel.py   조업·생산 채널 추가 가치 대리 측정 (음성 결과)
@@ -99,8 +101,13 @@ python3 07_sparse_fems/run_all.py      # Task A~I + J~M + N~Q 일괄 (M1 기준 
 
 # 최종 Baseline v1.1 (end-to-end 단일 명령, M1 기준 522초)
 python3 final_baseline/run_baseline.py --config final_baseline/config.yaml
-python3 final_baseline/test_baseline.py          # 수용 테스트 18항
+python3 final_baseline/test_baseline.py          # 수용 테스트 24항
 python3 final_baseline/run_baseline.py --no-external --quick   # CORE 전용 축약 재현
+
+# 1차 모의평가 대응 3종 (보고서 28) — run_baseline 산출물 필요
+python3 final_baseline/peak_probability.py             # 45초  보정된 피크 초과 확률 + 분류 베이스라인
+python3 final_baseline/sequential_policy.py            # 40초  목표시각 순차경보 + SEL/TEST/LOCK 분리
+python3 final_baseline/error_conditions.py             # 4초   FP/FN 공정조건 + 블록 bootstrap
 
 # 후속 검증 4종 (보고서 24)
 python3 final_baseline/followup_mondrian.py            # 17초

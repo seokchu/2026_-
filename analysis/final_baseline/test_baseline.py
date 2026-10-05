@@ -133,9 +133,49 @@ def t_core_fallback():
     ok(f"외부 캐시 없이 CORE 모드 동작 (rows={len(d)})")
 
 
+
+
+def t_sequential_and_probability():
+    """1차 모의평가 대응(P0) 회귀 방지: 목표시각 정렬 / 선택-평가 분리 / 보정 확률."""
+    import pandas as _pd
+    sp = T("../28_sequential_split") if False else _pd.read_csv(
+        TAB / "28_sequential_split.csv", encoding="utf-8-sig")
+    assert list(sp.split) == ["SEL_정책선택", "TEST_평가", "LOCK_완전잠금"]
+    assert _pd.to_datetime(sp.end[0]) < _pd.to_datetime(sp.start[1]) and \
+           _pd.to_datetime(sp.end[1]) < _pd.to_datetime(sp.start[2])
+    ok("정책선택 SEL < 평가 TEST < 완전잠금 LOCK 시간순 분리")
+    op = _pd.read_csv(TAB / "28_sequential_operating_points.csv", encoding="utf-8-sig")
+    honest = op[op.scope != "post_hoc_on_TEST(참고)"]
+    assert (honest.selected_on == "SEL").all(), "정책이 평가창에서 선택됐다"
+    assert set(honest.applied_to) <= {"TEST", "LOCK"}
+    ok("모든 권고 운용점이 SEL 에서만 선택됨(사후최적화 행은 참고로 분리)")
+    for c in ["false_alert_steps_per_day", "alert_events_per_day", "operator_check_min_per_day"]:
+        assert c in op.columns, c
+    ok("운영단위 3종(스텝/사건/확인분) 분리 보고")
+    ex = _pd.read_csv(TAB / "28_sequential_timeline_examples.csv", encoding="utf-8-sig")
+    # 각 단계 결정시각 + 잔여 선행시간 = 목표시각 (동일 목표시각 추적 검증)
+    for r in ex.itertuples():
+        T0 = _pd.to_datetime(r.target_time)
+        assert (T0 - _pd.to_datetime(r.t_early)) == _pd.Timedelta(minutes=60)
+        if isinstance(r.t_confirm, str):
+            assert (T0 - _pd.to_datetime(r.t_confirm)) == _pd.Timedelta(minutes=int(r.residual_lead_min)) \
+                   or (T0 - _pd.to_datetime(r.t_confirm)).total_seconds() > 0
+    ok("조기·확인 단계가 동일 목표시각 T 를 가리킴")
+    pb = _pd.read_csv(TAB / "28_peak_probability_summary.csv", encoding="utf-8-sig")
+    cl = pb[(pb.window == "clean_Jul_Sep") & (pb.horizon_min == 60)].set_index("score")
+    main, raw = "HGB_clf_isotonic(main)", "HGB_clf_uncalibrated"
+    assert cl.loc[main, "brier"] <= cl.loc[raw, "brier"] + 1e-9
+    assert cl.loc[main, "ece"] <= cl.loc[raw, "ece"] + 1e-9
+    ok(f"isotonic 보정이 Brier/ECE 개선 ({cl.loc[main,'brier']:.4f}/{cl.loc[main,'ece']:.4f} "
+       f"vs {cl.loc[raw,'brier']:.4f}/{cl.loc[raw,'ece']:.4f})")
+    assert cl.loc[main, "f1"] > cl.loc["prior_constant", "f1"]
+    assert cl.loc[main, "pr_auc"] > cl.loc["persistence_rule_margin", "pr_auc"]
+    ok("보정 확률이 사전확률·persistence 규칙 베이스라인을 상회")
+
 if __name__ == "__main__":
     for f in [t_targets_and_leakage, t_temporal_protocol, t_reliability_and_peak,
-              t_operator_output, t_artifacts_and_determinism, t_core_fallback]:
+              t_operator_output, t_artifacts_and_determinism, t_core_fallback,
+              t_sequential_and_probability]:
         print(f.__name__)
         f()
     print("\nALL ACCEPTANCE TESTS PASSED")

@@ -1,0 +1,2 @@
+﻿verdict,ratios_sequential_wins_on_TEST,cost_seq_TEST,cost_single_TEST,recall_seq_TEST,recall_single_TEST,lead_seq_TEST,lead_single_TEST,boot_delta,boot_ci_lo,boot_ci_hi,rule,note
+단일 경보 우월 — 순차 주장 철회,0/7,0.7588235294117647,0.7588235294117647,0.35294117647058826,0.35294117647058826,2.5,2.5,0.0,0.0,0.0,사전 선언: 7개 비용비 중 4개 이상에서 TEST 비용 우월 AND 기본 비용비의 일블록 bootstrap 95% CI 상한<0 이면 '순차 우월',정책은 SEL 에서만 선택. TEST/LOCK 은 적용만. 목표시각 T 기준 평가

@@ -173,3 +173,12 @@ LOW 밴드 MAE 13.85, 점예측 MAE·권고 운용점·에스컬레이션 결론
 - 회귀 점검: final_metrics·reliability·recommended_operating_point·routing_2x2·information_gap_validation·core_vs_public
   6개 표의 수치 최대차 **0**, 문자열 열 동일 → 수정이 평가 경로에 영향 없음을 확인.
 - 배포 스모크(최근 400행): 조건부 Q 그룹 적용 일치, early_q 0.82 / confirm_q 0.86 / gate none 적용 일치, 금지문구 0건.
+
+## 1차 모의평가 대응 (2026-10-05, 보고서 28·29)
+- 지적 5건 전부 코드에서 사실 확인. 상세 로그: `analysis/state/review_log.md`
+- **철회**: "h60→h15 에스컬레이션 7/7 비용 우월"(TEST 0/7), 권고 운용점 0.294/0.864/41.5분(사후최적화 재분류)
+- **추가**: 선행 ≥30분 제약 순차 운용점(포착 0.529·선행 45분), 보정 피크 초과 확률(h60 F1 0.444·ECE 0.0460),
+  FP/FN 공정조건 분해(미탐 12~18시 0.812, 오경보 밴드 LOW/OOD 73.7%), 운영단위 3종 분리
+- 신규 스크립트: `sequential_policy.py`, `peak_probability.py`, `error_conditions.py`
+- 수용테스트 18항 → 24항. 제출용 보고서 `29_FINAL_SUBMISSION_REPORT.md` + 루트 README 전면 교체
+- 가설 H26~H28, 근거 F53~F58 → 원장 28건 / 근거 58건

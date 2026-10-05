@@ -23,3 +23,9 @@ analysis/tables/07N_external_solar_tariff_2021.csv
 analysis/tables/23_baseline_oof_rows.csv
 analysis/tables/23_baseline_operator_output.csv
 analysis/final_baseline/artifacts/
+
+# 1차 모의평가 대응 산출물 중 행 단위 파일 — 재실행으로 재생성.
+analysis/tables/28_peak_probability_rows.csv
+
+# 모의평가 입력 문서(외부 리뷰) — 대응 결과는 보고서 28 에 기록. 원문은 커밋하지 않는다.
+모의 평가/
