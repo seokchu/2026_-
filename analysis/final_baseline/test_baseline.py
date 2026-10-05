@@ -99,6 +99,21 @@ def t_artifacts_and_determinism():
     p = IN.predict(d.tail(20), b)
     assert len(p) == 20 and p.filter(like="forecast_").notna().all().all()
     ok("배포 산출물 재로딩 + 추론 동작")
+    if CFG["reliability"].get("conformal_groups") == "level3":
+        for h in (1, 2, 3, 4):
+            spec = b["models"][h].get("conformal_spec", {})
+            assert spec.get("mode") == "level3"
+            assert len(spec.get("level_cuts", [])) == 2 and spec.get("group_Q")
+        ok("배포 artifact도 평가와 동일한 level3 조건부 conformal 사용")
+    bp = T("recommended_operating_point")
+    row = bp[(bp.window == CFG["data"]["primary_window"]) &
+             (bp.cost_ratio_FN_FP == CFG["policy"]["default_cost_ratio"]) &
+             (bp.scope == "all_policies")].iloc[0]
+    dp = b.get("default_policy", {})
+    assert abs(float(dp["early_q"]) - float(row.early_q)) < 1e-12
+    assert abs(float(dp["confirm_q"]) - float(row.confirm_q)) < 1e-12
+    assert str(dp["gate"]) == str(row.gate)
+    ok("배포 추론 기본 임계/게이트 = 평가에서 선택된 권고 운용점")
     F = FT.CORE
     sl = d.iloc[:3000]
     a = MD.point_model("hgb", CFG["seed"]).fit(sl[F].values, sl.y_h4.values).predict(sl[F].values[:50])
