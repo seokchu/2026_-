@@ -6,6 +6,7 @@
 0. `23_FINAL_BASELINE_V1.md` — **최종 Baseline v1.1**(단일 재현 파이프라인 / 성능·신뢰도·경보·파레토·정보부족 진단 / 코드 감사 결과). 여기부터 읽는다
 0-1. `24_BASELINE_V1_FOLLOWUP.md` — 후속 검증(조건부 conformal 채택 / 비용 단위 환산 / 채널 가치 **음성** / 타 공장 전이 **음성**)
 0-2. `25_PRESENTATION_OUTLINE.md` — 발표 구성안 12슬라이드 + 금지 주장 목록
+0-3. `26_OFFICIAL_TASK_HORIZON_VERIFICATION.md` — **공식 예측 정의 검증**(가이드북 next-step 예측 근거 / day-ahead 96-step 오해 정리 / 현행 h15~h60 유지 판정)
 1. `22_FINAL_TOPIC_GATE.md` — 최종 주제 게이트 7문 직답
 2. `17_국내_저계측_제조환경_실무근거.md` — **도입부용 Problem Validity 자료**(국내 저계측 제조현황 공식통계 / 외부데이터 질문 방어논리 / 안전한 주장·금지 주장)
 3. `16_조건부보정_피크정의_다중horizon_3상태.md` — **2단계 검증**(Mondrian conformal / 피크 정의 통일 / 다중 horizon 경보 / 3상태). 피크 임계 정의가 여기서 확정된다
