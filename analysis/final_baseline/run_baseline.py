@@ -38,27 +38,69 @@ def env_record(cfg, o):
                 clean_window=f"{cl.ts15.min()} ~ {cl.ts15.max()} (n={len(cl)})")
 
 
-def deployment_fit(d, cons, cfg, art_dir):
-    """평가 종료 후 전체 허용 과거 데이터로 재적합 — 배포용 산출물."""
+def deployment_fit(d, cons, cfg, art_dir, bp):
+    """평가 종료 후 전체 허용 과거 데이터로 재적합 — 배포용 산출물.
+
+    평가와 배포의 신뢰도 보정 방식/기본 경보정책이 반드시 같아야 한다.
+    """
     seed, rcfg = cfg["seed"], cfg["reliability"]
     art_dir.mkdir(parents=True, exist_ok=True)
     mode_by_h = {int(r.horizon_min): r.feature_mode for r in cons.itertuples()}
     n = len(d); cut = int(n * (1 - cfg["data"]["cal_fraction"]))
     TR, CA = d.iloc[:cut], d.iloc[cut:]
+
+    # 평가에서 선택된 기본 운용점을 배포 번들에도 고정한다.
+    primary = cfg["data"]["primary_window"]
+    r0 = cfg["policy"]["default_cost_ratio"]
+    prow = bp[(bp.window == primary) & (bp.cost_ratio_FN_FP == r0) &
+              (bp.scope == "all_policies")]
+    if len(prow) != 1:
+        raise RuntimeError(f"default policy row not unique: window={primary}, r={r0}, n={len(prow)}")
+    prow = prow.iloc[0]
+    default_policy = dict(
+        policy=str(prow.policy), gate=str(prow.gate),
+        early_horizon_min=int(prow.early_horizon_min),
+        early_q=float(prow.early_q),
+        confirm_horizon_min=(int(prow.confirm_horizon_min)
+                             if pd.notna(prow.confirm_horizon_min) else None),
+        confirm_q=(float(prow.confirm_q) if pd.notna(prow.confirm_q) else None),
+        cost_ratio=float(r0))
+
     bundle = dict(seed=seed, config=cfg, mode_by_horizon=mode_by_h,
                   ramp_cut=float(np.quantile(TR.kw_ramp4.abs(), cfg["regime"]["ramp_quantile"])),
-                  horizons=H, models={})
+                  horizons=H, default_policy=default_policy, models={})
     for h in H:
         F = FT.CORE if mode_by_h[h * 15] == "CORE" else FT.PUBLIC
         ycol = f"y_h{h}"
         pt = MD.point_model(cfg["forecast"]["point_model"], seed).fit(d[F].values, d[ycol].values)
-        lo, hi, cal_width, (m_lo, m_hi, Q) = MD.fit_cqr(
-            TR[F].values, TR[ycol].values, CA[F].values, CA[ycol].values, CA[F].values[:1],
-            *rcfg["quantile_levels"], rcfg["conformal_alpha"], seed)
+        conformal_mode = rcfg.get("conformal_groups", "none")
+        if conformal_mode == "level3":
+            level_cuts = np.quantile(TR.kw.values, [1 / 3, 2 / 3])
+            gcal = np.digitize(CA.kw.values, level_cuts)
+            gprobe = np.digitize(CA.kw.values[:1], level_cuts)
+            _, _, cal_width, (m_lo, m_hi, Qs, Qg) = MD.fit_cqr_grouped(
+                TR[F].values, TR[ycol].values, CA[F].values, CA[ycol].values,
+                CA[F].values[:1], gcal, gprobe,
+                *rcfg["quantile_levels"], rcfg["conformal_alpha"], seed)
+            conformal_spec = dict(
+                mode="level3",
+                level_cuts=[float(x) for x in level_cuts],
+                group_Q={int(k): float(v) for k, v in Qs.items()},
+                global_Q=float(Qg))
+            Q_compat = float(Qg)
+        else:
+            _, _, cal_width, (m_lo, m_hi, Q) = MD.fit_cqr(
+                TR[F].values, TR[ycol].values, CA[F].values, CA[ycol].values,
+                CA[F].values[:1], *rcfg["quantile_levels"],
+                rcfg["conformal_alpha"], seed)
+            conformal_spec = dict(mode="global", global_Q=float(Q))
+            Q_compat = float(Q)
+
         cv, ood_cut = MD.ood_scorer(TR[F].values, rcfg["ood_quantile"])
         cal_pred = pt.predict(CA[F].values)
         bundle["models"][h] = dict(
-            features=F, point=pt, q_lo=m_lo, q_hi=m_hi, conformal_Q=Q,
+            features=F, point=pt, q_lo=m_lo, q_hi=m_hi,
+            conformal_Q=Q_compat, conformal_spec=conformal_spec,
             band_cuts=[float(x) for x in np.quantile(cal_width, rcfg["band_width_quantiles"])],
             ood=cv, ood_cut=ood_cut,
             alert_thresholds={float(q): float(np.quantile(cal_pred, q))
@@ -126,7 +168,7 @@ def main():
 
     # 6) 배포 적합 + 산출물
     art = ROOT / cfg["output"]["artifacts_dir"]
-    bundle, mode_by_h = deployment_fit(d, cons, cfg, art)
+    bundle, mode_by_h = deployment_fit(d, cons, cfg, art, bp)
     env = env_record(cfg, o)
     (art / "model_metadata.json").write_text(json.dumps(dict(
         **{k: v for k, v in env.items()}, feature_mode_by_horizon=mode_by_h,
