@@ -1,0 +1,56 @@
+# Baseline v1 설정 — 중요한 정책 가정은 모두 이 파일에 노출한다.
+seed: 20260926
+
+data:
+  # 평가 창: all_2021(증강 포함) / clean_Jul_Sep(원본). 보고 기준은 clean.
+  primary_window: clean_Jul_Sep
+  n_splits: 5                 # rolling-origin (expanding window) 폴드 수
+  cal_fraction: 0.2           # 각 폴드 학습구간의 뒤쪽 20% = calibration
+
+forecast:
+  horizons_min: [15, 30, 45, 60]
+  point_model: hgb            # HistGradientBoostingRegressor
+  eval_baselines: [persistence, ridge, rf, hgb]
+
+external:
+  use_external_data: true     # false 또는 캐시 없음 -> CORE 모드로 자동 강등
+  # horizon 별 feature mode 선택 규칙 (CAL 구간만 사용, 사전 명시)
+  selection_rule:
+    min_rel_mae_gain: 0.01        # CAL MAE 1% 이상 개선
+    max_rel_peak_mae_loss: 0.02   # CAL 피크조건 MAE 2% 이상 악화 금지
+    max_rel_width_loss: 0.05      # CAL 구간폭 5% 이상 확대 금지
+
+reliability:
+  quantile_levels: [0.05, 0.95]
+  conformal_alpha: 0.10           # 목표 90% 구간
+  band_width_quantiles: [0.5, 0.8]  # CAL 구간폭 분위 -> HIGH/MEDIUM/LOW 컷
+  ood_quantile: 0.99              # TRAIN Mahalanobis 분위
+
+regime:
+  method: rule_ramp               # Baseline v1 채택 (근거: 보고서 20)
+  ramp_quantile: 0.9
+  compare_methods: [gmm3]         # 진단용 견고성 비교
+
+peak:
+  window_days: 30
+  quantile: 0.95                  # 직전 30일 p95 (적응형·leak-free)
+  min_days: 7
+
+policy:
+  early_horizon_min: 60
+  confirm_horizon_min: 15
+  threshold_grid: [0.50, 0.54, 0.58, 0.62, 0.66, 0.70, 0.74, 0.78, 0.82, 0.86, 0.90, 0.94, 0.98]
+  gates: [none, advisory_if_unsure, confirm_only_if_unsure]
+  cost_ratios: [1, 2, 5, 10, 20, 50, 100]
+  default_cost_ratio: 10          # 기본 시연값. 보편 최적 아님
+  minimum_lead_minutes: 30
+  operator_advisory_capacity: 12   # 일 권고 건수 상한(운영 부담 기준선)
+
+diagnosis:
+  uncertain_bands: [LOW, OOD]
+  context_ramp_quantile: 0.9      # TRAIN 기준 고변동 컷
+
+output:
+  table_prefix: "23_baseline"
+  figure_prefix: "23_baseline"
+  artifacts_dir: analysis/final_baseline/artifacts

@@ -1,0 +1,286 @@
+{
+  "topic": "저계측 제조환경을 위한 신뢰도 기반 다중시점 최대수요전력 사전경보 및 정보부족 진단 시스템",
+  "git_commit": "f6c4d655bd4b8d365873e0c974ea0a3498ec1bda",
+  "generated_at": "2026-10-05T15:01:29.786102",
+  "python_version": "3.9.6",
+  "package_versions": {
+    "numpy": "2.0.2",
+    "pandas": "2.3.3",
+    "sklearn": "1.6.1",
+    "scipy": "1.13.1",
+    "matplotlib": "3.9.4",
+    "joblib": "1.5.3",
+    "yaml": "6.0.3"
+  },
+  "evaluation_window": "2021-02-22 11:15:00 ~ 2021-09-14 23:00:00 (n=19620)",
+  "clean_window": "2021-07-01 00:15:00 ~ 2021-09-14 23:00:00 (n=7288)",
+  "selected_point_model": "hgb",
+  "selected_feature_mode_by_horizon": {
+    "15": "CORE",
+    "30": "CORE",
+    "45": "CORE",
+    "60": "CORE"
+  },
+  "peak_definition": "trailing_30d_p95",
+  "reliability_method": "quantile HGB + split conformal(CQR) + interval-width bands + Mahalanobis OOD",
+  "regime_method": "rule_ramp",
+  "alert_policy": {
+    "policy": "escalate_h60_to_h15",
+    "gate": "none",
+    "early_horizon_min": 60,
+    "confirm_horizon_min": 15,
+    "early_q": 0.82,
+    "confirm_q": 0.86,
+    "cost_ratio": 10
+  },
+  "default_cost_ratio": 10,
+  "main_metrics": {
+    "15": {
+      "mae": 5.668103275865666,
+      "rmse": 8.880187218292596,
+      "nmae": 0.06017810041621357,
+      "persistence_improvement": 0.2830764200883552,
+      "coverage": 0.8605927552140505,
+      "coverage_peak_only": 0.26014319809069214,
+      "peak_ap": 0.5873445813350212,
+      "mae_transition": 8.108698466754163
+    },
+    "30": {
+      "mae": 7.261857426126962,
+      "rmse": 11.329879888595777,
+      "nmae": 0.07709344239175597,
+      "persistence_improvement": 0.4007855607077059,
+      "coverage": 0.8682766190998902,
+      "coverage_peak_only": 0.11961722488038277,
+      "peak_ap": 0.41699729735379093,
+      "mae_transition": 10.15301859350816
+    },
+    "45": {
+      "mae": 8.155381640653522,
+      "rmse": 13.343989359548008,
+      "nmae": 0.08657436958452705,
+      "persistence_improvement": 0.447288150971927,
+      "coverage": 0.8712952799121844,
+      "coverage_peak_only": 0.12200956937799043,
+      "peak_ap": 0.3750095165786073,
+      "mae_transition": 10.814397585533042
+    },
+    "60": {
+      "mae": 8.763977143410338,
+      "rmse": 14.441246301205952,
+      "nmae": 0.09303213778488101,
+      "persistence_improvement": 0.4791794856268945,
+      "coverage": 0.8588090010976949,
+      "coverage_peak_only": 0.11933174224343675,
+      "peak_ap": 0.3674408192337872,
+      "mae_transition": 10.454323949234535
+    }
+  },
+  "policy_result": {
+    "policy_event_recall": 0.8639455782312925,
+    "policy_false_alerts_per_day": 3.0559824368825463,
+    "policy_mean_lead_min": 41.45669291338583,
+    "policy_lead_ge_30min_share": 0.7480314960629921,
+    "policy_normalized_cost": 0.2938775510204082
+  },
+  "escalation_wins_by_ratio": {
+    "1": true,
+    "2": true,
+    "5": true,
+    "10": true,
+    "20": true,
+    "50": true,
+    "100": true
+  },
+  "pareto_front_size": 26,
+  "external_data_effect": [
+    {
+      "window": "clean_Jul_Sep",
+      "horizon_min": 15,
+      "mae_core": 5.668103275865666,
+      "peak_ap_core": 0.5873445813350212,
+      "mae_public": 5.739705738399299,
+      "peak_ap_public": 0.5818544641431275,
+      "rel_mae_gain_public": -0.012632526093607137,
+      "low_or_ood_share_selected": 0.24725576289791437,
+      "coverage_peak_only_selected": 0.26014319809069214,
+      "mae_transition_selected": 8.108698466754163,
+      "selected_mode": "CORE"
+    },
+    {
+      "window": "clean_Jul_Sep",
+      "horizon_min": 30,
+      "mae_core": 7.261857426126962,
+      "peak_ap_core": 0.41699729735379093,
+      "mae_public": 7.397033420138396,
+      "peak_ap_public": 0.39755292926291663,
+      "rel_mae_gain_public": -0.018614520511665865,
+      "low_or_ood_share_selected": 0.24080680570801316,
+      "coverage_peak_only_selected": 0.11961722488038277,
+      "mae_transition_selected": 10.15301859350816,
+      "selected_mode": "CORE"
+    },
+    {
+      "window": "clean_Jul_Sep",
+      "horizon_min": 45,
+      "mae_core": 8.155381640653522,
+      "peak_ap_core": 0.3750095165786073,
+      "mae_public": 8.001254975820858,
+      "peak_ap_public": 0.3280504241034179,
+      "rel_mae_gain_public": 0.01889876790858712,
+      "low_or_ood_share_selected": 0.2708562019758507,
+      "coverage_peak_only_selected": 0.12200956937799043,
+      "mae_transition_selected": 10.814397585533042,
+      "selected_mode": "CORE"
+    },
+    {
+      "window": "clean_Jul_Sep",
+      "horizon_min": 60,
+      "mae_core": 8.763977143410338,
+      "peak_ap_core": 0.3674408192337872,
+      "mae_public": 8.20692942701085,
+      "peak_ap_public": 0.3782177494544892,
+      "rel_mae_gain_public": 0.06356106448980574,
+      "low_or_ood_share_selected": 0.2694840834248079,
+      "coverage_peak_only_selected": 0.11933174224343675,
+      "mae_transition_selected": 10.454323949234535,
+      "selected_mode": "CORE"
+    }
+  ],
+  "information_gap_result": [
+    {
+      "flag": "information_gap_flag",
+      "n_flagged": 992,
+      "share": 0.13611416026344675,
+      "mae_flagged": 12.084475814322237,
+      "mae_unflagged": 8.240798191449633,
+      "mae_ratio": 1.4664205497545943,
+      "coverage_flagged": 0.7913306451612903,
+      "coverage_unflagged": 0.8694409148665819,
+      "peak_prevalence_flagged": 0.13004032258064516,
+      "auc_for_high_error": 0.5598230146797581,
+      "ap_for_high_error": 0.23266583915756645,
+      "lift_over_base": 1.1630100382581237
+    },
+    {
+      "flag": "ood_flag",
+      "n_flagged": 430,
+      "share": 0.05900109769484083,
+      "mae_flagged": 9.343374103414616,
+      "mae_unflagged": 8.72764866676965,
+      "mae_ratio": 1.0705488339590628,
+      "coverage_flagged": 0.8813953488372093,
+      "coverage_unflagged": 0.8573928258967629,
+      "peak_prevalence_flagged": 0.06744186046511629,
+      "auc_for_high_error": 0.49741768959099497,
+      "ap_for_high_error": 0.19928624972892048,
+      "lift_over_base": 0.9961578793034104
+    },
+    {
+      "flag": "band_LOW_or_OOD",
+      "n_flagged": 1964,
+      "share": 0.2694840834248079,
+      "mae_flagged": 13.83877169718857,
+      "mae_unflagged": 6.891907927854281,
+      "mae_ratio": 2.0079739662884784,
+      "coverage_flagged": 0.7571283095723014,
+      "coverage_unflagged": 0.8963185574755823,
+      "peak_prevalence_flagged": 0.18075356415478616,
+      "auc_for_high_error": 0.624790885797175,
+      "ap_for_high_error": 0.26958735715870175,
+      "lift_over_base": 1.3475669814627012
+    },
+    {
+      "flag": "transition_like_flag",
+      "n_flagged": 1036,
+      "share": 0.1421514818880351,
+      "mae_flagged": 10.454323949234535,
+      "mae_unflagged": 8.48387488959814,
+      "mae_ratio": 1.2322581468112304,
+      "coverage_flagged": 0.7953667953667953,
+      "coverage_unflagged": 0.869321817018554,
+      "peak_prevalence_flagged": 0.14864864864864866,
+      "auc_for_high_error": 0.5213248252381726,
+      "ap_for_high_error": 0.20851836596642875,
+      "lift_over_base": 1.0423057964083215
+    },
+    {
+      "flag": "int_width_top20",
+      "n_flagged": 1458,
+      "share": 0.20005488474204172,
+      "mae_flagged": 15.864163467243346,
+      "mae_unflagged": 6.988321627089835,
+      "mae_ratio": 2.270096357006067,
+      "coverage_flagged": 0.6844993141289437,
+      "coverage_unflagged": 0.902401372212693,
+      "peak_prevalence_flagged": 0.20644718792866942,
+      "auc_for_high_error": 0.647609568783573,
+      "ap_for_high_error": 0.3030707915112417,
+      "lift_over_base": 1.5149382225884291
+    }
+  ],
+  "routing_2x2": [
+    {
+      "cell": "A_reliable_explained",
+      "n": 3217,
+      "share": 0.441410537870472,
+      "mae_h60": 6.000666336834946,
+      "coverage_h60": 0.8759714019272614,
+      "mean_interval_width": 34.9971713155715,
+      "peak_prevalence": 0.014609884986011812,
+      "transition_share": 0.16474976686353746,
+      "ood_share": 0.0,
+      "per_day": 42.37541163556531
+    },
+    {
+      "cell": "B_uncertain_explained",
+      "n": 972,
+      "share": 0.13336992316136115,
+      "mae_h60": 15.629164203159146,
+      "coverage_h60": 0.7222222222222222,
+      "mean_interval_width": 113.23463290258124,
+      "peak_prevalence": 0.23251028806584362,
+      "transition_share": 0.5205761316872428,
+      "ood_share": 0.2088477366255144,
+      "per_day": 12.803512623490668
+    },
+    {
+      "cell": "C_uncertain_unexplained(information_gap)",
+      "n": 992,
+      "share": 0.13611416026344675,
+      "mae_h60": 12.084475814322237,
+      "coverage_h60": 0.7913306451612903,
+      "mean_interval_width": 107.97924625460853,
+      "peak_prevalence": 0.13004032258064516,
+      "transition_share": 0.0,
+      "ood_share": 0.2288306451612903,
+      "per_day": 13.066959385290888
+    },
+    {
+      "cell": "D_reliable_unexplained",
+      "n": 2107,
+      "share": 0.2891053787047201,
+      "mae_h60": 8.252669293924143,
+      "coverage_h60": 0.9273849074513526,
+      "mean_interval_width": 68.10648026295263,
+      "peak_prevalence": 0.008068343616516375,
+      "transition_share": 0.0,
+      "ood_share": 0.0,
+      "per_day": 27.754116355653128
+    }
+  ],
+  "known_limitations": [
+    "단일 공장·단일 연도(2021) 데이터. 타 공장 전이 미검증",
+    "1~6월 증강 구간 포함. 보고 기준은 원본 7~9월",
+    "피크 정의는 운영적 정의(직전 30일 p95). KEPCO 계약전력/요금 최대수요와 동일하지 않다",
+    "생산량(t)은 생산계획 사전확정 가정에 의존(민감도는 보고서 10 L3s 참조)",
+    "외부 기상은 추정 최근접 관측소(울산) 기반. 공식 위치 미공개",
+    "피크위험은 보정된 확률이 아니라 정규화 점수"
+  ],
+  "next_steps": [
+    "계약전력·요금 단가 확인 후 비용비를 실제 단위로 치환",
+    "타 공장/타 업종 데이터 전이(Category B) 검증",
+    "설비 가동상태 1~2채널 추가 시 정보부족 플래그 감소량 측정",
+    "경보 임계의 온라인 재보정(드리프트 대응)"
+  ]
+}

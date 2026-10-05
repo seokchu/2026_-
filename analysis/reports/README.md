@@ -3,19 +3,21 @@
 목적: **주제 선정 전 근거 축적.** 최종 주제는 선정하지 않았다.
 
 ## 읽는 순서
-0. `17_국내_저계측_제조환경_실무근거.md` — **도입부용 Problem Validity 자료**(국내 저계측 제조현황 공식통계 / 외부데이터 질문 방어논리 / 안전한 주장·금지 주장)
-1. `16_조건부보정_피크정의_다중horizon_3상태.md` — **2단계 검증**(Mondrian conformal / 피크 정의 통일 / 다중 horizon 경보 / 3상태). 피크 임계 정의가 여기서 확정된다
-2. `15_FINAL_DIRECTION_RECOMMENDATION.md` — **증거 기반 최종 방향 권고 15문 직답** (07 Sparse-FEMS 단계 결론)
-3. `07_DISCOVERY_SUMMARY.md` — 전체 종합 + 부록의 정정 사항 (EDA 단계 종합)
-4. `06_CROSS_DATASET_비교.md` — 4개 데이터셋 횡단 비교, 미해결 질문
-5. `05_IDEA_INGREDIENT_BANK.md` — 조합 가능한 재료 목록(주제 아님)
-6. Sparse-FEMS 단계: `10_SPARSE_FEMS_INFORMATION_ABLATION.md`, `11_HARD_CONDITION_MAP.md`,
+0. `23_FINAL_BASELINE_V1.md` — **최종 Baseline v1**(단일 재현 파이프라인 / 성능·신뢰도·경보·파레토·정보부족 진단 / 코드 감사 결과). 여기부터 읽는다
+1. `22_FINAL_TOPIC_GATE.md` — 최종 주제 게이트 7문 직답
+2. `17_국내_저계측_제조환경_실무근거.md` — **도입부용 Problem Validity 자료**(국내 저계측 제조현황 공식통계 / 외부데이터 질문 방어논리 / 안전한 주장·금지 주장)
+3. `16_조건부보정_피크정의_다중horizon_3상태.md` — **2단계 검증**(Mondrian conformal / 피크 정의 통일 / 다중 horizon 경보 / 3상태). 피크 임계 정의가 여기서 확정된다
+4. `15_FINAL_DIRECTION_RECOMMENDATION.md` — **증거 기반 최종 방향 권고 15문 직답** (07 Sparse-FEMS 단계 결론)
+5. `07_DISCOVERY_SUMMARY.md` — 전체 종합 + 부록의 정정 사항 (EDA 단계 종합)
+6. `06_CROSS_DATASET_비교.md` — 4개 데이터셋 횡단 비교, 미해결 질문
+7. `05_IDEA_INGREDIENT_BANK.md` — 조합 가능한 재료 목록(주제 아님)
+8. Sparse-FEMS 단계: `10_SPARSE_FEMS_INFORMATION_ABLATION.md`, `11_HARD_CONDITION_MAP.md`,
    `12_NILM_SR_FEASIBILITY.md`, `13_RELIABILITY_AND_DECISION_POLICY.md`, `14_PROGRESSIVE_INSTRUMENTATION.md`
-   / 상태판: `analysis/state/hypothesis_ledger.csv`(가설 20건), `analysis/state/evidence_registry.csv`(근거 40건)
-7. 3단계(외부데이터·운영정책): `18_EXTERNAL_DATA_STRESS_TEST.md`, `19_COST_MULTI_HORIZON_POLICY.md`,
+   / 상태판: `analysis/state/hypothesis_ledger.csv`(가설 22건), `analysis/state/evidence_registry.csv`(근거 47건)
+9. 3단계(외부데이터·운영정책): `18_EXTERNAL_DATA_STRESS_TEST.md`, `19_COST_MULTI_HORIZON_POLICY.md`,
    `20_THREE_STATE_ROBUSTNESS.md`, `21_OPERATOR_DIAGNOSTIC_LAYER.md` / 문제타당성: `17_국내_저계측_제조환경_실무근거.md`
-7. 후속검증/문서조사: `08_후속검증_A_B_C.md`, `09_KAMP_공식문서_조사.md`
-8. 개별 보고서: `01_사출성형_보고서.md`, `02_용접_보고서.md`, `03_프레스유압_보고서.md`(부록 A 정정 포함), `04_전력_보고서.md`(부록 A 정정 포함)
+10. 후속검증/문서조사: `08_후속검증_A_B_C.md`, `09_KAMP_공식문서_조사.md`
+11. 개별 보고서: `01_사출성형_보고서.md`, `02_용접_보고서.md`, `03_프레스유압_보고서.md`(부록 A 정정 포함), `04_전력_보고서.md`(부록 A 정정 포함)
 
 ## 디렉터리
 ```
@@ -53,6 +55,17 @@ analysis/
       integrated_alert_policy.py  비용 x 다중 horizon 통합 경보 정책 스윕
       three_state_robustness.py   3레짐 구조의 정의 독립성(규칙/변화점/GMM/HMM)
       operator_diagnostic.py      작업자 진단 계층 + 정보부족 플래그 검증
+  final_baseline/                 **최종 Baseline v1** — 단일 명령 end-to-end 파이프라인
+      config.yaml                 seed·horizon·외부데이터 규칙·신뢰도·레짐·피크·정책·비용비 설정
+      features.py                 CORE/PUBLIC 특성 빌더 + 메타데이터 + 외부캐시 없을 때 CORE 강등
+      models.py                   점예측/분위예측/CQR/OOD/밴드
+      pipeline.py                 rolling-origin 평가(TRAIN/CAL/TEST) + 모드 게이트 + 레짐 + 지표
+      policy.py                   h60->h15 에스컬레이션 스윕 + 비용비 + 비용x선행시간 파레토
+      diagnosis.py                2x2 라우팅 + 정보부족 플래그 + 작업자 출력(물리조치 금지)
+      report.py                   통합 지표표 + 그림 6종 + baseline_summary.json
+      run_baseline.py             단일 진입점 (--no-external / --quick)
+      inference.py                배포 산출물 로딩 + 다음 시점 추론
+      test_baseline.py            수용 테스트 16항 (누수/정렬/임계/금지문구/재현성)
   state/     analysis_state.md, hypothesis_ledger.csv, evidence_registry.csv
   (중간 캐시 07C_oof_predictions / 07D_latent_state_features / 07F_row_scores / 07O_policy_rows 는 원본 관측값을
    행 단위로 담으므로 .gitignore 처리. run_all.py 재실행으로 재생성된다.)
@@ -75,6 +88,11 @@ python3 06_followup/A_state_split_regression.py
 python3 06_followup/B_duplication_handling.py
 python3 06_followup/C_conformal_exceedance.py
 python3 07_sparse_fems/run_all.py      # Task A~I + J~M + N~Q 일괄 (M1 기준 약 25분, 외부데이터 최초 1회 다운로드 포함)
+
+# 최종 Baseline v1 (end-to-end 단일 명령, M1 기준 472초)
+python3 final_baseline/run_baseline.py --config final_baseline/config.yaml
+python3 final_baseline/test_baseline.py          # 수용 테스트 16항
+python3 final_baseline/run_baseline.py --no-external --quick   # CORE 전용 축약 재현
 ```
 전부 CPU 단독, M1 MacBook Air 기준 총 3분 이내. GPU 불필요.
 
@@ -89,7 +107,10 @@ python3 07_sparse_fems/run_all.py      # Task A~I + J~M + N~Q 일괄 (M1 기준 
 - **외부데이터**: 공휴일(python holidays, MIT), NOAA NCEI ISD global-hourly(미국 정부 공개), 태양기하(계산),
   한전 산업용 시간대 구분(구조만). 출처·라이선스·가용성 전체는 `analysis/tables/07N_external_data_sources.csv`.
   원본 캐시 `analysis/external_cache/` 는 커밋하지 않는다(재다운로드 가능).
-- **추가 설치**: `holidays` 0.83 (공휴일 달력)
+- **추가 설치**: `holidays` 0.83 (공휴일 달력), `PyYAML` 6.0.3 / `joblib` 1.5.3 (Baseline v1 설정·모델 산출물)
+- 4단계 Baseline v1 런타임: 전체 472초(특성·5폴드 평가 약 420초 / 정책 스윕 1,118개 4초 / 진단·그림·배포적합 약 45초).
+  행 단위 산출물(`23_baseline_oof_rows.csv` 15MB, `23_baseline_operator_output.csv` 2MB)과
+  모델 산출물(`analysis/final_baseline/artifacts/` 4.7MB)은 커밋하지 않는다(재실행으로 재생성).
 - 2단계(J~M) 런타임: mondrian 152.7s / peak_definition 3.2s / multihorizon_alert 21.3s / three_state 13.8s
 - **피크 임계 정의(확정)**: `p95_trailing_30d` — 직전 30일 p95, 적응형·leak-free (근거 `07K_peak_definitions.csv`).
   08/13 보고서의 기존 수치는 각자의 정의(전체구간 p95 / 첫 폴드 p95)를 병기한 채 보존한다.

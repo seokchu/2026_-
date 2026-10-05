@@ -15,3 +15,9 @@ hmmlearn 0.3.3
 # 3단계(N~Q) 추가
 holidays 0.83
 외부데이터: NOAA NCEI ISD global-hourly (무인증 HTTPS, 2026-09-28 취득)
+
+# 4단계 Baseline v1 추가
+joblib 1.5.3
+PyYAML 6.0.3
+실행: python3 analysis/final_baseline/run_baseline.py --config analysis/final_baseline/config.yaml (M1 CPU 472초)
+수용테스트: python3 analysis/final_baseline/test_baseline.py (16항)

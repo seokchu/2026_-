@@ -18,3 +18,8 @@ analysis/tables/07O_policy_rows.csv
 # 외부데이터 원본 캐시 — NOAA ISD 원본은 재다운로드 가능하므로 커밋하지 않는다.
 analysis/external_cache/
 analysis/tables/07N_external_solar_tariff_2021.csv
+
+# Baseline v1 행 단위 산출물 / 모델 산출물 — 재실행으로 재생성(원본 관측값 포함).
+analysis/tables/23_baseline_oof_rows.csv
+analysis/tables/23_baseline_operator_output.csv
+analysis/final_baseline/artifacts/

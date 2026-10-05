@@ -1,0 +1,57 @@
+﻿feature_name,source,information_group,available_at_decision_time,future_known,requires_external_data,safe_for_h15,safe_for_h30,safe_for_h45,safe_for_h60,assumption_dependent,notes
+d,KAMP,calendar,True,True,False,True,True,True,True,False,달력/계절요금 — 사전 확정
+day,KAMP,calendar,True,True,False,True,True,True,True,False,달력/계절요금 — 사전 확정
+day_length_h,public_external,solar_tariff,True,True,True,True,True,True,True,False,결정론적 태양기하 + KEPCO 시간대 구조
+days_since_prev_nonworkday,public_external,public_calendar,True,True,True,True,True,True,True,False,holidays 0.83(KR) 파생 — 사전 확정
+days_to_next_nonworkday,public_external,public_calendar,True,True,True,True,True,True,True,False,holidays 0.83(KR) 파생 — 사전 확정
+ext_dew_spread,public_external,public_weather,True,False,True,True,True,True,True,False,"NOAA ISD, t 이하 마지막 정시 관측"
+ext_dewpoint,public_external,public_weather,True,False,True,True,True,True,True,False,"NOAA ISD, t 이하 마지막 정시 관측"
+ext_heat_index_proxy,public_external,public_weather,True,False,True,True,True,True,True,False,"NOAA ISD, t 이하 마지막 정시 관측"
+ext_pressure,public_external,public_weather,True,False,True,True,True,True,True,False,"NOAA ISD, t 이하 마지막 정시 관측"
+ext_pressure_diff3h,public_external,public_weather,True,False,True,True,True,True,True,False,"NOAA ISD, t 이하 마지막 정시 관측"
+ext_prev_day_tmax,public_external,public_weather,True,False,True,True,True,True,True,False,"NOAA ISD, t 이하 마지막 정시 관측"
+ext_prev_day_tmin,public_external,public_weather,True,False,True,True,True,True,True,False,"NOAA ISD, t 이하 마지막 정시 관측"
+ext_temp,public_external,public_weather,True,False,True,True,True,True,True,False,"NOAA ISD, t 이하 마지막 정시 관측"
+ext_temp_diff1h,public_external,public_weather,True,False,True,True,True,True,True,False,"NOAA ISD, t 이하 마지막 정시 관측"
+ext_temp_roll24h,public_external,public_weather,True,False,True,True,True,True,True,False,"NOAA ISD, t 이하 마지막 정시 관측"
+ext_visibility,public_external,public_weather,True,False,True,True,True,True,True,False,"NOAA ISD, t 이하 마지막 정시 관측"
+ext_wind,public_external,public_weather,True,False,True,True,True,True,True,False,"NOAA ISD, t 이하 마지막 정시 관측"
+is_bridge_day,public_external,public_calendar,True,True,True,True,True,True,True,False,holidays 0.83(KR) 파생 — 사전 확정
+is_daylight,public_external,solar_tariff,True,True,True,True,True,True,True,False,결정론적 태양기하 + KEPCO 시간대 구조
+is_holiday,public_external,public_calendar,True,True,True,True,True,True,True,False,holidays 0.83(KR) 파생 — 사전 확정
+is_operating,KAMP,production,True,False,False,True,True,True,True,True,ERP 시간집계. 생산계획 사전확정 가정 시 사용
+is_weekend,KAMP,calendar,True,True,False,True,True,True,True,False,달력/계절요금 — 사전 확정
+is_workday,public_external,public_calendar,True,True,True,True,True,True,True,False,holidays 0.83(KR) 파생 — 사전 확정
+kw,KAMP,power_history,True,False,False,True,True,True,True,False,t 시점까지의 집계 수요
+kw_diff1,KAMP,power_history,True,False,False,True,True,True,True,False,t 시점까지의 집계 수요
+kw_lag1,KAMP,power_history,True,False,False,True,True,True,True,False,t 시점까지의 집계 수요
+kw_lag2,KAMP,power_history,True,False,False,True,True,True,True,False,t 시점까지의 집계 수요
+kw_lag3,KAMP,power_history,True,False,False,True,True,True,True,False,t 시점까지의 집계 수요
+kw_lag4,KAMP,power_history,True,False,False,True,True,True,True,False,t 시점까지의 집계 수요
+kw_lag8,KAMP,power_history,True,False,False,True,True,True,True,False,t 시점까지의 집계 수요
+kw_lag96,KAMP,power_history,True,False,False,True,True,True,True,False,t 시점까지의 집계 수요
+kw_max96,KAMP,power_history,True,False,False,True,True,True,True,False,t 시점까지의 집계 수요
+kw_ramp4,KAMP,power_history,True,False,False,True,True,True,True,False,t 시점까지의 집계 수요
+kw_roll4,KAMP,power_history,True,False,False,True,True,True,True,False,t 시점까지의 집계 수요
+kw_roll96,KAMP,power_history,True,False,False,True,True,True,True,False,t 시점까지의 집계 수요
+kw_std4,KAMP,power_history,True,False,False,True,True,True,True,False,t 시점까지의 집계 수요
+kw_std96,KAMP,power_history,True,False,False,True,True,True,True,False,t 시점까지의 집계 수요
+m,KAMP,calendar,True,True,False,True,True,True,True,False,달력/계절요금 — 사전 확정
+nonwork_run_len,public_external,public_calendar,True,True,True,True,True,True,True,False,holidays 0.83(KR) 파생 — 사전 확정
+prod_diff,KAMP,production,True,False,False,True,True,True,True,True,ERP 시간집계. 생산계획 사전확정 가정 시 사용
+prod_lag4,KAMP,production,True,False,False,True,True,True,True,False,ERP 시간집계. 생산계획 사전확정 가정 시 사용
+qi,KAMP,calendar,True,True,False,True,True,True,True,False,달력/계절요금 — 사전 확정
+solar_elevation,public_external,solar_tariff,True,True,True,True,True,True,True,False,결정론적 태양기하 + KEPCO 시간대 구조
+tariff_load_zone_code,public_external,solar_tariff,True,True,True,True,True,True,True,False,결정론적 태양기하 + KEPCO 시간대 구조
+tariff_season_code,public_external,solar_tariff,True,True,True,True,True,True,True,False,결정론적 태양기하 + KEPCO 시간대 구조
+tod,KAMP,calendar,True,True,False,True,True,True,True,False,달력/계절요금 — 사전 확정
+강수량,KAMP,weather_observed,True,False,False,True,True,True,True,False,KAMP 동시각 관측값(예보 미사용)
+기온,KAMP,weather_observed,True,False,False,True,True,True,True,False,KAMP 동시각 관측값(예보 미사용)
+생산량,KAMP,production,True,False,False,True,True,True,True,True,ERP 시간집계. 생산계획 사전확정 가정 시 사용
+습도,KAMP,weather_observed,True,False,False,True,True,True,True,False,KAMP 동시각 관측값(예보 미사용)
+시간,KAMP,calendar,True,True,False,True,True,True,True,False,달력/계절요금 — 사전 확정
+전기요금(계절),KAMP,calendar,True,True,False,True,True,True,True,False,달력/계절요금 — 사전 확정
+풍속,KAMP,weather_observed,True,False,False,True,True,True,True,False,KAMP 동시각 관측값(예보 미사용)
+평균,KAMP,EXCLUDED,True,False,False,False,False,False,False,False,같은 시간 4개 분값의 평균 = 타깃 포함(누수)
+공장인원,KAMP,EXCLUDED,True,False,False,False,False,False,False,False,생산량과 spearman 0.994 중복
+인건비,KAMP,EXCLUDED,True,False,False,False,False,False,False,False,"고유값 2개, 사실상 상수"
