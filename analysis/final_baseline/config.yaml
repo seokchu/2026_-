@@ -23,6 +23,8 @@ external:
 reliability:
   quantile_levels: [0.05, 0.95]
   conformal_alpha: 0.10           # 목표 90% 구간
+  conformal_groups: level3        # 조건부 보정 그룹: level3(현재수요 TRAIN 3분위) 또는 none
+                                  # 채택 근거: 24_mondrian_summary.csv (피크 coverage +0.196, 폭 +1.3%)
   band_width_quantiles: [0.5, 0.8]  # CAL 구간폭 분위 -> HIGH/MEDIUM/LOW 컷
   ood_quantile: 0.99              # TRAIN Mahalanobis 분위
 

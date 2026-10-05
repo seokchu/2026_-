@@ -1,0 +1,2 @@
+﻿n_events,delta_kw_mean,delta_kw_median,delta_kw_p90,delta_kw_max,exceed_step_mean,source
+147,8.390816326530633,6.0,18.970000000000162,37.0,7.085202863961831,"23_baseline_oof_rows.csv (clean_Jul_Sep, 직전 30일 p95 기준 초과량)"

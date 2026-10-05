@@ -42,6 +42,32 @@ def fit_cqr(Xtr, ytr, Xcal, ycal, Xte, lo_q, hi_q, alpha, seed):
     return m_lo.predict(Xte) - Q, m_hi.predict(Xte) + Q, cal_width, (m_lo, m_hi, Q)
 
 
+def fit_cqr_grouped(Xtr, ytr, Xcal, ycal, Xte, gcal, gte, lo_q, hi_q, alpha, seed,
+                    min_group=50):
+    """Mondrian(조건부) conformal — 그룹별 보정분위. 그룹은 결정시점 정보로만 정의한다.
+
+    표본이 min_group 미만인 그룹은 전역 분위로 대체한다. 보정은 CAL 만 사용한다.
+    """
+    m_lo = quantile_model(lo_q, seed).fit(Xtr, ytr)
+    m_hi = quantile_model(hi_q, seed).fit(Xtr, ytr)
+    c_lo, c_hi = m_lo.predict(Xcal), m_hi.predict(Xcal)
+    E = np.maximum(c_lo - ycal, ycal - c_hi)
+    qf = lambda e: float(np.quantile(e, min(1.0, (1 - alpha) * (1 + 1 / len(e)))))
+    Qg = qf(E)
+    t_lo, t_hi = m_lo.predict(Xte), m_hi.predict(Xte)
+    lo, hi = t_lo - Qg, t_hi + Qg
+    cal_lo, cal_hi = c_lo - Qg, c_hi + Qg
+    Qs = {}
+    for g in np.unique(gcal):
+        mk = gcal == g
+        Qk = qf(E[mk]) if mk.sum() >= min_group else Qg
+        Qs[g] = Qk
+        tk = gte == g
+        lo[tk], hi[tk] = t_lo[tk] - Qk, t_hi[tk] + Qk
+        cal_lo[mk], cal_hi[mk] = c_lo[mk] - Qk, c_hi[mk] + Qk
+    return lo, hi, cal_hi - cal_lo, (m_lo, m_hi, Qs, Qg)
+
+
 def ood_scorer(Xtr, q):
     """Mahalanobis 거리 + TRAIN 분위 컷. OOD 는 '큰 오차' 와 다른 개념이다."""
     cv = EmpiricalCovariance().fit(Xtr)

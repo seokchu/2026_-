@@ -3,7 +3,9 @@
 목적: **주제 선정 전 근거 축적.** 최종 주제는 선정하지 않았다.
 
 ## 읽는 순서
-0. `23_FINAL_BASELINE_V1.md` — **최종 Baseline v1**(단일 재현 파이프라인 / 성능·신뢰도·경보·파레토·정보부족 진단 / 코드 감사 결과). 여기부터 읽는다
+0. `23_FINAL_BASELINE_V1.md` — **최종 Baseline v1.1**(단일 재현 파이프라인 / 성능·신뢰도·경보·파레토·정보부족 진단 / 코드 감사 결과). 여기부터 읽는다
+0-1. `24_BASELINE_V1_FOLLOWUP.md` — 후속 검증(조건부 conformal 채택 / 비용 단위 환산 / 채널 가치 **음성** / 타 공장 전이 **음성**)
+0-2. `25_PRESENTATION_OUTLINE.md` — 발표 구성안 12슬라이드 + 금지 주장 목록
 1. `22_FINAL_TOPIC_GATE.md` — 최종 주제 게이트 7문 직답
 2. `17_국내_저계측_제조환경_실무근거.md` — **도입부용 Problem Validity 자료**(국내 저계측 제조현황 공식통계 / 외부데이터 질문 방어논리 / 안전한 주장·금지 주장)
 3. `16_조건부보정_피크정의_다중horizon_3상태.md` — **2단계 검증**(Mondrian conformal / 피크 정의 통일 / 다중 horizon 경보 / 3상태). 피크 임계 정의가 여기서 확정된다
@@ -13,7 +15,7 @@
 7. `05_IDEA_INGREDIENT_BANK.md` — 조합 가능한 재료 목록(주제 아님)
 8. Sparse-FEMS 단계: `10_SPARSE_FEMS_INFORMATION_ABLATION.md`, `11_HARD_CONDITION_MAP.md`,
    `12_NILM_SR_FEASIBILITY.md`, `13_RELIABILITY_AND_DECISION_POLICY.md`, `14_PROGRESSIVE_INSTRUMENTATION.md`
-   / 상태판: `analysis/state/hypothesis_ledger.csv`(가설 22건), `analysis/state/evidence_registry.csv`(근거 47건)
+   / 상태판: `analysis/state/hypothesis_ledger.csv`(가설 25건), `analysis/state/evidence_registry.csv`(근거 52건)
 9. 3단계(외부데이터·운영정책): `18_EXTERNAL_DATA_STRESS_TEST.md`, `19_COST_MULTI_HORIZON_POLICY.md`,
    `20_THREE_STATE_ROBUSTNESS.md`, `21_OPERATOR_DIAGNOSTIC_LAYER.md` / 문제타당성: `17_국내_저계측_제조환경_실무근거.md`
 10. 후속검증/문서조사: `08_후속검증_A_B_C.md`, `09_KAMP_공식문서_조사.md`
@@ -66,6 +68,10 @@ analysis/
       run_baseline.py             단일 진입점 (--no-external / --quick)
       inference.py                배포 산출물 로딩 + 다음 시점 추론
       test_baseline.py            수용 테스트 16항 (누수/정렬/임계/금지문구/재현성)
+      followup_mondrian.py        조건부(Mondrian) conformal — 피크구간 coverage 개선 검증 (v1.1 채택 근거)
+      followup_cost_units.py      비용비 -> 실제 단위 환산(측정 ΔkW + 파라미터 시나리오)
+      followup_added_channel.py   조업·생산 채널 추가 가치 대리 측정 (음성 결과)
+      followup_transfer_categoryB.py  타 공장 공개데이터(figshare CC BY 4.0) 전이 검증 (음성 결과)
   state/     analysis_state.md, hypothesis_ledger.csv, evidence_registry.csv
   (중간 캐시 07C_oof_predictions / 07D_latent_state_features / 07F_row_scores / 07O_policy_rows 는 원본 관측값을
    행 단위로 담으므로 .gitignore 처리. run_all.py 재실행으로 재생성된다.)
@@ -93,6 +99,12 @@ python3 07_sparse_fems/run_all.py      # Task A~I + J~M + N~Q 일괄 (M1 기준 
 python3 final_baseline/run_baseline.py --config final_baseline/config.yaml
 python3 final_baseline/test_baseline.py          # 수용 테스트 16항
 python3 final_baseline/run_baseline.py --no-external --quick   # CORE 전용 축약 재현
+
+# 후속 검증 4종 (보고서 24)
+python3 final_baseline/followup_mondrian.py            # 17초
+python3 final_baseline/followup_cost_units.py          # 2초 (run_baseline 산출물 필요)
+python3 final_baseline/followup_added_channel.py       # 77초
+python3 final_baseline/followup_transfer_categoryB.py  # 34초 (최초 1회 figshare 11MB 다운로드)
 ```
 전부 CPU 단독, M1 MacBook Air 기준 총 3분 이내. GPU 불필요.
 
@@ -107,6 +119,9 @@ python3 final_baseline/run_baseline.py --no-external --quick   # CORE 전용 축
 - **외부데이터**: 공휴일(python holidays, MIT), NOAA NCEI ISD global-hourly(미국 정부 공개), 태양기하(계산),
   한전 산업용 시간대 구분(구조만). 출처·라이선스·가용성 전체는 `analysis/tables/07N_external_data_sources.csv`.
   원본 캐시 `analysis/external_cache/` 는 커밋하지 않는다(재다운로드 가능).
+- **Category B 외부데이터**: Lee·Baek·Kim (2022) Scientific Data, 한국 제조공장 10개소 1분 전력,
+  figshare DOI 10.6084/m9.figshare.14822256.v9, **CC BY 4.0**. 캐시 `analysis/external_cache/categoryB/`(11MB, 비커밋).
+  인용·출처 표기 의무가 있으므로 발표 시 표기한다.
 - **추가 설치**: `holidays` 0.83 (공휴일 달력), `PyYAML` 6.0.3 / `joblib` 1.5.3 (Baseline v1 설정·모델 산출물)
 - 4단계 Baseline v1 런타임: 전체 472초(특성·5폴드 평가 약 420초 / 정책 스윕 1,118개 4초 / 진단·그림·배포적합 약 45초).
   행 단위 산출물(`23_baseline_oof_rows.csv` 15MB, `23_baseline_operator_output.csv` 2MB)과

@@ -116,9 +116,18 @@ def run_evaluation(d, mode, cfg):
             rec[f"mode_h{h}"] = chosen
 
             # ---- Module C: CQR 구간 + 신뢰도 밴드 + OOD
-            lo, hi, cal_width, _ = MD.fit_cqr(TR[F].values, ytr, CA[F].values, yca,
-                                              TE[F].values, *rcfg["quantile_levels"],
-                                              rcfg["conformal_alpha"], seed)
+            if rcfg.get("conformal_groups") == "level3":
+                # 조건부(Mondrian) 보정: 현재 수요의 TRAIN 3분위 구간별 보정분위 (후속 R 근거)
+                lvl_cuts = np.quantile(TR.kw, [1 / 3, 2 / 3])
+                gcal = np.digitize(CA.kw.values, lvl_cuts)
+                gte_ = np.digitize(TE.kw.values, lvl_cuts)
+                lo, hi, cal_width, _ = MD.fit_cqr_grouped(
+                    TR[F].values, ytr, CA[F].values, yca, TE[F].values, gcal, gte_,
+                    *rcfg["quantile_levels"], rcfg["conformal_alpha"], seed)
+            else:
+                lo, hi, cal_width, _ = MD.fit_cqr(TR[F].values, ytr, CA[F].values, yca,
+                                                  TE[F].values, *rcfg["quantile_levels"],
+                                                  rcfg["conformal_alpha"], seed)
             cv, ood_cut = MD.ood_scorer(TR[F].values, rcfg["ood_quantile"])
             maha = cv.mahalanobis(TE[F].values)
             rec[f"int_lo_h{h}"], rec[f"int_hi_h{h}"] = lo, hi

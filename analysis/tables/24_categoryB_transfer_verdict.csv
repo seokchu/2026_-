@@ -1,0 +1,2 @@
+﻿verdict,n_factories,n_within_10pct,n_transfer_beats_persistence,median_transfer_vs_local_rel,rule,source,note
+전이 비유효 — 3/10 공장만 10% 이내,10,3,3,0.15225946858510375,전이 nMAE 가 local 대비 +10% 이내인 공장이 과반이면 '전이 유효',"figshare 10.6084/m9.figshare.14822256.v9 (CC BY 4.0), 1분->15분 재표본",생산량·기상 없음. 집계전력+달력만 전이. KAMP 공장은 이 실험의 대상이 아니다(척도·기간 불일치)

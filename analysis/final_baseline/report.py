@@ -168,7 +168,8 @@ def summary_json(path, cfg, o, cons, cvp, gap, rout, esc, par, meta, env, limits
         selected_point_model=cfg["forecast"]["point_model"],
         selected_feature_mode_by_horizon={int(h): c.loc[h, "feature_mode"] for h in c.index},
         peak_definition=f"trailing_{cfg['peak']['window_days']}d_p{int(cfg['peak']['quantile']*100)}",
-        reliability_method="quantile HGB + split conformal(CQR) + interval-width bands + Mahalanobis OOD",
+        reliability_method=("quantile HGB + split conformal(CQR, groups=%s) + interval-width bands"
+                            " + Mahalanobis OOD" % cfg["reliability"].get("conformal_groups", "none")),
         regime_method=cfg["regime"]["method"],
         alert_policy=meta, default_cost_ratio=cfg["policy"]["default_cost_ratio"],
         main_metrics={int(h): {k: float(c.loc[h, k]) for k in

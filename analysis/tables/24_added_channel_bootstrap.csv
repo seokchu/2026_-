@@ -1,0 +1,5 @@
+﻿window,level,vs,delta,ci_lo,ci_hi,significant,improves
+all_2021,B_plus_operating,A_no_operating,-0.26245392909865206,-0.3125415665917537,-0.21039788077514562,True,True
+clean_Jul_Sep,B_plus_operating,A_no_operating,0.08163702852815938,0.025203253474177303,0.13665595953880916,True,False
+all_2021,C_plus_production,A_no_operating,-0.08769163122786229,-0.13970513732588657,-0.03673315247801125,True,True
+clean_Jul_Sep,C_plus_production,A_no_operating,-0.04668498889720183,-0.11138169138194402,0.018280369885009407,False,False
