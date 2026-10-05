@@ -17,7 +17,7 @@
 
 ## 슬라이드 3 — 시스템 구조 (FIGURE 1)
 `23_baseline_fig1_architecture.png`. 7블록. 한 명령 재현:
-`python3 analysis/final_baseline/run_baseline.py --config analysis/final_baseline/config.yaml` (368초, CPU)
+`python3 analysis/final_baseline/run_baseline.py --config analysis/final_baseline/config.yaml` (522초, CPU)
 
 ## 슬라이드 4 — 데이터 진단 (심사항목 1)
 - 1~6월 일 프로파일 복제 → 랜덤 분할 MAE 6.16 vs 시간순 8.74 kw (보고서 08).
@@ -66,7 +66,7 @@
 - 결론 문장: "외부데이터는 평균오차를 일부 줄이지만, 신뢰도·피크·전환 문제를 대체하지 못한다."
 
 ## 슬라이드 11 — 재현성 (심사항목 6)
-단일 명령 / 고정 seed 20260926 / 수용테스트 16항 / 외부데이터 출처·라이선스 전표
+단일 명령 / 고정 seed 20260926 / 수용테스트 18항 / 외부데이터 출처·라이선스 전표
 (`07N_external_data_sources.csv`, figshare CC BY 4.0) / 가설 원장 25건 · 근거 레지스트리 52건 /
 행 단위 산출물·모델 산출물은 비커밋(재실행 재생성).
 

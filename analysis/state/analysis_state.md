@@ -116,7 +116,7 @@
 목적: 3단계까지 채택된 결론을 **하나의 재현 가능한 end-to-end 시스템**으로 통합.
 위치 `analysis/final_baseline/`, 단일 명령
 `python3 analysis/final_baseline/run_baseline.py --config analysis/final_baseline/config.yaml`
-(M1 CPU 472초). 보고서 `analysis/reports/23_FINAL_BASELINE_V1.md`.
+(M1 CPU 522초, v1.1). 보고서 `analysis/reports/23_FINAL_BASELINE_V1.md`.
 
 ## 코드 감사에서 고친 것 (기존 결론 영향 포함)
 | ID | 문제 | 조치 | 결론 영향 |
@@ -137,7 +137,7 @@
 | 외부데이터 게이트 | PUBLIC 채택 0/20 칸. 테스트에서는 h60 −6.36% — **사후적으로만 관측** (H22 기각) |
 | 2×2 라우팅 | A 44.1%(MAE 6.00) / B 13.3%(15.63) / C 정보부족 13.6%(12.08) / D 28.9%(8.25) |
 | 작업자 검토율 | 11.96% (HUMAN_REVIEW 5.66 + INFORMATION_GAP 5.82 건·일) |
-| 수용테스트 | 16항 전부 통과 (`test_baseline.py`) |
+| 수용테스트 | 18항 전부 통과 (`test_baseline.py`, 평가-배포 정합성 2항 포함) |
 
 새 가설 H21(지지) / H22(기각), 근거 F41~F47 추가 → 원장 22건 / 근거 47건.
 
@@ -166,3 +166,10 @@ LOW 밴드 MAE 13.85, 점예측 MAE·권고 운용점·에스컬레이션 결론
 3. 요금 단가·계약전력 확보 후 비용비 치환
 4. 설비 단위 상태 센서 확보 시 채널 가치 재검증(대리 실험 한계)
 5. 전이 미세조정(fine-tuning) 설계 — 음성 결과의 일반화 금지
+
+## v1.1 평가-배포 정합성 검증 재실행 (2026-10-05, HEAD 1139a7a)
+- 원격 수정 반영: 배포 artifact 의 level3 조건부 conformal 저장, 추론의 평가 선택 운용점 사용, 회귀 테스트 2항.
+- 전체 재실행 rc=0 / 522초. 수용테스트 18/18 PASS.
+- 회귀 점검: final_metrics·reliability·recommended_operating_point·routing_2x2·information_gap_validation·core_vs_public
+  6개 표의 수치 최대차 **0**, 문자열 열 동일 → 수정이 평가 경로에 영향 없음을 확인.
+- 배포 스모크(최근 400행): 조건부 Q 그룹 적용 일치, early_q 0.82 / confirm_q 0.86 / gate none 적용 일치, 금지문구 0건.

@@ -69,7 +69,7 @@ analysis/
       report.py                   통합 지표표 + 그림 6종 + baseline_summary.json
       run_baseline.py             단일 진입점 (--no-external / --quick)
       inference.py                배포 산출물 로딩 + 다음 시점 추론
-      test_baseline.py            수용 테스트 16항 (누수/정렬/임계/금지문구/재현성)
+      test_baseline.py            수용 테스트 18항 (누수/정렬/임계/금지문구/재현성/평가-배포 정합성)
       followup_mondrian.py        조건부(Mondrian) conformal — 피크구간 coverage 개선 검증 (v1.1 채택 근거)
       followup_cost_units.py      비용비 -> 실제 단위 환산(측정 ΔkW + 파라미터 시나리오)
       followup_added_channel.py   조업·생산 채널 추가 가치 대리 측정 (음성 결과)
@@ -97,9 +97,9 @@ python3 06_followup/B_duplication_handling.py
 python3 06_followup/C_conformal_exceedance.py
 python3 07_sparse_fems/run_all.py      # Task A~I + J~M + N~Q 일괄 (M1 기준 약 25분, 외부데이터 최초 1회 다운로드 포함)
 
-# 최종 Baseline v1 (end-to-end 단일 명령, M1 기준 472초)
+# 최종 Baseline v1.1 (end-to-end 단일 명령, M1 기준 522초)
 python3 final_baseline/run_baseline.py --config final_baseline/config.yaml
-python3 final_baseline/test_baseline.py          # 수용 테스트 16항
+python3 final_baseline/test_baseline.py          # 수용 테스트 18항
 python3 final_baseline/run_baseline.py --no-external --quick   # CORE 전용 축약 재현
 
 # 후속 검증 4종 (보고서 24)
@@ -125,7 +125,7 @@ python3 final_baseline/followup_transfer_categoryB.py  # 34초 (최초 1회 figs
   figshare DOI 10.6084/m9.figshare.14822256.v9, **CC BY 4.0**. 캐시 `analysis/external_cache/categoryB/`(11MB, 비커밋).
   인용·출처 표기 의무가 있으므로 발표 시 표기한다.
 - **추가 설치**: `holidays` 0.83 (공휴일 달력), `PyYAML` 6.0.3 / `joblib` 1.5.3 (Baseline v1 설정·모델 산출물)
-- 4단계 Baseline v1 런타임: 전체 472초(특성·5폴드 평가 약 420초 / 정책 스윕 1,118개 4초 / 진단·그림·배포적합 약 45초).
+- 4단계 Baseline v1.1 런타임: 전체 522초(특성·5폴드 평가 약 497초 / 정책 스윕 1,118개 3초 / 진단·그림·배포적합 약 22초).
   행 단위 산출물(`23_baseline_oof_rows.csv` 15MB, `23_baseline_operator_output.csv` 2MB)과
   모델 산출물(`analysis/final_baseline/artifacts/` 4.7MB)은 커밋하지 않는다(재실행으로 재생성).
 - 2단계(J~M) 런타임: mondrian 152.7s / peak_definition 3.2s / multihorizon_alert 21.3s / three_state 13.8s
