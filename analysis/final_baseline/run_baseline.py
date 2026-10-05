@@ -179,15 +179,16 @@ def main():
         ood_cuts={h: bundle["models"][h]["ood_cut"] for h in H},
         regime_method=cfg["regime"]["method"], ramp_cut=bundle["ramp_cut"]),
         ensure_ascii=False, indent=2, default=str), encoding="utf-8")
-    limits = ["단일 공장·단일 연도(2021) 데이터. 타 공장 전이 미검증",
+    limits = ["단일 KAMP 대상 공장·단일 연도(2021) 데이터",
               "1~6월 증강 구간 포함. 보고 기준은 원본 7~9월",
               "피크 정의는 운영적 정의(직전 30일 p95). KEPCO 계약전력/요금 최대수요와 동일하지 않다",
               "생산량(t)은 생산계획 사전확정 가정에 의존(민감도는 보고서 10 L3s 참조)",
               "외부 기상은 추정 최근접 관측소(울산) 기반. 공식 위치 미공개",
-              "피크위험은 보정된 확률이 아니라 정규화 점수"]
+              "피크위험은 보정된 확률이 아니라 정규화 점수",
+              "Category B 타 공장 전이는 공개 10개 공장에 대한 단일 leave-one-factory-out 설계만 검증; 전이학습 일반화 금지"]
     nexts = ["계약전력·요금 단가 확인 후 비용비를 실제 단위로 치환",
-             "타 공장/타 업종 데이터 전이(Category B) 검증",
-             "설비 가동상태 1~2채널 추가 시 정보부족 플래그 감소량 측정",
+             "설비 가동상태 1~2채널 실측 확보 시 정보부족/신뢰도 개선량 재검증",
+             "타 공장 소량 미세조정·도메인 적응은 별도 후속 검증",
              "경보 임계의 온라인 재보정(드리프트 대응)"]
     RP.summary_json(HERE / "baseline_summary.json", cfg, o, cons, cvp, gap, rout, esc,
                     dict(front=front, all=allp), meta, env, limits, nexts)
