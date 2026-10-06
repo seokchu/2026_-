@@ -1,0 +1,5 @@
+﻿policy_scope,window,n_false_alarm_events,mean_steps,near_miss_share,mean_pred_margin_kw
+all_policies,LOCK_완전잠금,2,2.0,0.0,2.833312350462137
+all_policies,TEST,8,2.125,0.25,-3.981926907526617
+lead_constrained_ge30min,LOCK_완전잠금,13,1.6153846153846154,0.23076923076923078,-7.9355497707754745
+lead_constrained_ge30min,TEST,16,3.25,0.25,-11.856937062943336

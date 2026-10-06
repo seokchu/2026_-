@@ -1,0 +1,5 @@
+﻿assumption,horizon_min,fold,variant,state,n_train,n_test,action
+strict_lag,15,0,V4_state3_specific,TRANSITION_LIKE,373,316,fallback_to_global
+strict_lag,30,0,V4_state3_specific,TRANSITION_LIKE,373,316,fallback_to_global
+strict_lag,45,0,V4_state3_specific,TRANSITION_LIKE,373,316,fallback_to_global
+strict_lag,60,0,V4_state3_specific,TRANSITION_LIKE,373,316,fallback_to_global

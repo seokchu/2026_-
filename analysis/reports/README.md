@@ -4,7 +4,8 @@
 
 ## 읽는 순서
 0. `29_FINAL_SUBMISSION_REPORT.md` — **제출용 최종 결과보고서**(문제→데이터→모델→확률·신뢰도→경보→오류조건→현장→한계)
-0-0. `28_REVIEW_R1_RESPONSE.md` — **1차 모의평가 대응**(순차경보 재구현 / 정책선택 누수 제거 / 보정 확률 / FP·FN 조건, **철회된 주장 포함**)
+0-0. `30_STATE_MODEL_AND_ERROR_AUDIT.md` — **상태별 모델 채택 여부(기각) / 오류분석 격하 / 필수 시각화**
+0-0b. `28_REVIEW_R1_RESPONSE.md` — **1차 모의평가 대응**(순차경보 재구현 / 정책선택 누수 제거 / 보정 확률 / FP·FN 조건, **철회된 주장 포함**)
 0-1. `23_FINAL_BASELINE_V1.md` — **최종 Baseline v1.1**(단일 재현 파이프라인 / 성능·신뢰도·경보·파레토·정보부족 진단 / 코드 감사 결과). 여기부터 읽는다
 0-1. `24_BASELINE_V1_FOLLOWUP.md` — 후속 검증(조건부 conformal 채택 / 비용 단위 환산 / 채널 가치 **음성** / 타 공장 전이 **음성**)
 0-2. `25_PRESENTATION_OUTLINE.md` — 발표 구성안 12슬라이드 + 금지 주장 목록
@@ -19,7 +20,7 @@
 7. `05_IDEA_INGREDIENT_BANK.md` — 조합 가능한 재료 목록(주제 아님)
 8. Sparse-FEMS 단계: `10_SPARSE_FEMS_INFORMATION_ABLATION.md`, `11_HARD_CONDITION_MAP.md`,
    `12_NILM_SR_FEASIBILITY.md`, `13_RELIABILITY_AND_DECISION_POLICY.md`, `14_PROGRESSIVE_INSTRUMENTATION.md`
-   / 상태판: `analysis/state/hypothesis_ledger.csv`(가설 28건), `analysis/state/evidence_registry.csv`(근거 58건)
+   / 상태판: `analysis/state/hypothesis_ledger.csv`(가설 31건), `analysis/state/evidence_registry.csv`(근거 62건)
 9. 3단계(외부데이터·운영정책): `18_EXTERNAL_DATA_STRESS_TEST.md`, `19_COST_MULTI_HORIZON_POLICY.md`,
    `20_THREE_STATE_ROBUSTNESS.md`, `21_OPERATOR_DIAGNOSTIC_LAYER.md` / 문제타당성: `17_국내_저계측_제조환경_실무근거.md`
 10. 후속검증/문서조사: `08_후속검증_A_B_C.md`, `09_KAMP_공식문서_조사.md`
@@ -103,6 +104,11 @@ python3 07_sparse_fems/run_all.py      # Task A~I + J~M + N~Q 일괄 (M1 기준 
 python3 final_baseline/run_baseline.py --config final_baseline/config.yaml
 python3 final_baseline/test_baseline.py          # 수용 테스트 24항
 python3 final_baseline/run_baseline.py --no-external --quick   # CORE 전용 축약 재현
+
+# 상태별 모델·오류감사 3종 (보고서 30)
+python3 final_baseline/state_model_test.py             # 185초 상태별 모델 4변형 x 2가정 + 군집 개수 점검
+python3 final_baseline/missed_event_taxonomy.py        # 3초   미탐 원인 분해 + 복구 가능성
+python3 final_baseline/state_visuals.py                # 25초  FIG 10~13
 
 # 1차 모의평가 대응 3종 (보고서 28) — run_baseline 산출물 필요
 python3 final_baseline/peak_probability.py             # 45초  보정된 피크 초과 확률 + 분류 베이스라인

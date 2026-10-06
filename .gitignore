@@ -29,3 +29,6 @@ analysis/tables/28_peak_probability_rows.csv
 
 # 모의평가 입력 문서(외부 리뷰) — 대응 결과는 보고서 28 에 기록. 원문은 커밋하지 않는다.
 모의 평가/
+
+# 상태별 모델 실험 행 단위 산출물 — 재실행으로 재생성.
+analysis/tables/30_state_model_rows.csv
