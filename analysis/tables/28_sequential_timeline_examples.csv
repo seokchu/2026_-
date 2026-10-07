@@ -1,3 +1,4 @@
 ﻿case,target_time,t_early,score_early,t_confirm,score_confirm,threshold_early,threshold_confirm,actual_kw,peak_threshold,label,state,residual_lead_min,reliability_band_at_early
-confirmed_catch,2021-08-26 11:00:00,2021-08-26 10:00:00,188.48,2021-08-26 10:15:00,187.06,182.89,,193.0,190.0,1,confirmed,60,LOW
-missed,2021-08-26 09:45:00,2021-08-26 08:45:00,175.05,2021-08-26 09:00:00,184.18,182.89,,191.0,190.0,1,no_watch,60,MEDIUM
+confirmed_catch,2021-08-26 11:15:00,2021-08-26 10:15:00,199.86,2021-08-26 11:00:00,188.69,148.91,188.21,192.0,190.0,1,confirmed,15,LOW
+rejected_at_confirm,2021-08-24 18:15:00,2021-08-24 17:15:00,175.48,2021-08-24 18:00:00,159.63,148.91,188.21,148.0,190.0,0,rejected,15,OOD
+missed,2021-08-26 11:00:00,2021-08-26 10:00:00,191.6,2021-08-26 10:45:00,185.45,148.91,188.21,193.0,190.0,1,rejected,15,MEDIUM

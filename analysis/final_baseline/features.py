@@ -16,7 +16,12 @@ sys.path.insert(0, str(ROOT / "analysis" / "07_sparse_fems"))
 import _fe                                              # noqa: E402
 from common import TAB                                  # noqa: E402
 
-CORE = _fe.LEVELS["L3_+production"]                     # power + calendar + weather(관측) + production
+# v2: 주기 인코딩 + 휴무/재가동 특성을 CORE 에 추가한다(31_v2_ablation 근거, A2+A4).
+#     전부 결정시점 t 까지의 정보 또는 달력으로부터 결정론적으로 계산된다 → 누수 없음.
+V2CYC = [f"tod_{f}{k}" for k in (1, 2, 3) for f in ("sin", "cos")] + ["dow_sin", "dow_cos"]
+V2SHUT = ["off_run_len", "on_run_len", "restart_recent", "kw_vs_roll96", "kw_ratio_roll96"]
+V2EXTRA = V2CYC + V2SHUT
+CORE = _fe.LEVELS["L3_+production"] + V2EXTRA   # power+calendar+weather(관측)+production+v2
 CALX = ["is_holiday", "is_workday", "is_bridge_day", "days_to_next_nonworkday",
         "days_since_prev_nonworkday", "nonwork_run_len"]
 WEAX = ["ext_temp", "ext_dewpoint", "ext_pressure", "ext_wind", "ext_visibility",
@@ -33,7 +38,29 @@ EXT_TABLES = ["07N_external_calendar_2021", "07N_external_weather_hourly_filled"
 GROUP = ({c: "power_history" for c in _fe.L0} | {c: "calendar" for c in _fe.CAL} |
          {c: "weather_observed" for c in _fe.WEA} | {c: "production" for c in _fe.PRD} |
          {c: "public_calendar" for c in CALX} | {c: "public_weather" for c in WEAX} |
-         {c: "solar_tariff" for c in TARX})
+         {c: "solar_tariff" for c in TARX} | {c: "cyclic_time" for c in V2CYC} |
+         {c: "operation_state_history" for c in V2SHUT})
+
+
+def add_v2_features(q):
+    """주기 인코딩(결정론적) + 휴무/재가동 경과(인과적)."""
+    for k in (1, 2, 3):
+        q[f"tod_sin{k}"] = np.sin(2 * np.pi * k * q.tod / 96)
+        q[f"tod_cos{k}"] = np.cos(2 * np.pi * k * q.tod / 96)
+    q["dow_sin"] = np.sin(2 * np.pi * q.day / 7)
+    q["dow_cos"] = np.cos(2 * np.pi * q.day / 7)
+    op = q.is_operating.values.astype(int)
+    off = np.zeros(len(op)); on = np.zeros(len(op))
+    for i in range(len(op)):
+        if op[i] == 0:
+            off[i] = (off[i - 1] + 1) if i else 1; on[i] = 0
+        else:
+            on[i] = (on[i - 1] + 1) if i else 1; off[i] = 0
+    q["off_run_len"], q["on_run_len"] = off, on
+    q["restart_recent"] = ((on > 0) & (on <= 8)).astype(float)
+    q["kw_vs_roll96"] = q.kw.values - q.kw_roll96.values
+    q["kw_ratio_roll96"] = q.kw.values / np.maximum(q.kw_roll96.values, 1.0)
+    return q
 
 
 def external_cache_ready():
@@ -46,6 +73,7 @@ def build(use_external=True, peak_window_days=30, peak_quantile=.95, peak_min_da
     반환 (df, mode) — mode 는 'PUBLIC' 또는 'CORE'(강등 포함).
     """
     q = _fe.build()
+    q = add_v2_features(q)
     mode = "CORE"
     if use_external and external_cache_ready():
         cal = pd.read_csv(TAB / "07N_external_calendar_2021.csv", parse_dates=["date"],

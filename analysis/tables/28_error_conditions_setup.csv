@@ -1,2 +1,2 @@
 ﻿ramp_cut_top20_SEL,load_cut_top20_SEL,interval_width_cut_top20_SEL,policy,early_q,confirm_stage,confirm_q,gate,note
-30.0,159.0,141.83217633447694,single_confirmB_h15,0.94,,,none,조건 컷은 SEL(과거)에서만 산출. TEST/LOCK 재탐색 없음
+30.0,159.0,55.42496559088225,seq_h60_to_confirmB_h15,0.74,confirmB_h15,0.94,none,조건 컷은 SEL(과거)에서만 산출. TEST/LOCK 재탐색 없음

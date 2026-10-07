@@ -1,0 +1,4 @@
+﻿scope,n_days,n_dup_days,n_dup_groups,n_redundant_days,dup_day_share
+all_2021,257.0,160.0,45,115.0,0.622568093385214
+clean_Jul_Sep,76.0,2.0,1,1.0,0.02631578947368421
+cross_boundary_groups,,,0,,

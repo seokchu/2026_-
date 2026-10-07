@@ -32,3 +32,10 @@ analysis/tables/28_peak_probability_rows.csv
 
 # 상태별 모델 실험 행 단위 산출물 — 재실행으로 재생성.
 analysis/tables/30_state_model_rows.csv
+
+# v2 ablation 행 단위 산출물(11MB) — v2_forecast_improve.py 재실행으로 재생성.
+analysis/tables/31_v2_oof_rows.csv
+
+# 제출 패키지(원시 학습데이터 포함) — 로컬에서만 생성한다.
+submission/*.zip
+submission/test_predictions.csv

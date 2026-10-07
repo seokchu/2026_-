@@ -1,0 +1,5 @@
+﻿lead_minutes,basis,detail,role_in_our_system,url
+15,한전 수요시한(디멘드 타임) 15분,최대수요전력 = 15분 평균전력. 기존 최대수요전력제어장치는 수요시한 시작 동기신호 기준으로 15분 뒤 피크를 예측해 단계적 부하차단,기존 제어기가 이미 커버하는 구간. h15 는 '기존 수준 재현' 비교군,https://www.eom.co.kr/3.engineering/2.elec/7.energy%20saving/2.power/demand_control.htm
+60,KPX 수요자원 거래시장 감축요청 통보 리드타임,"감축요청은 1시간 전 통보, 감축지속 원칙 1시간. 이행 상황을 보고 30분 내 추가 감축요청 가능",h60 = 제도상 표준 통보 리드타임과 일치. 본 시스템의 주 호라이즌,https://www.kpx.or.kr/boardDownload.es?bid=0045&list_no=51262&seq=16199
+30,KPX 추가 감축요청 여유(30분),1차 요청 후 부족분을 30분 내 추가 요청하는 운영 관행,minimum_lead_minutes=30 의 근거. 이보다 짧으면 제도적 조치 창이 없음,https://www.kpx.or.kr/boardDownload.es?bid=0045&list_no=51262&seq=16199
+30,산업 수요관리 스케줄링의 표준 시간슬롯,수요측 관리 스케줄링에서 30분 슬롯이 통상 단위. 산업 에너지수요 예측 가이드라인의 권장 해상도는 1분~1시간,30분 하한의 문헌적 보강,https://www.mdpi.com/1996-1073/19/10/2328

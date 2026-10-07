@@ -172,10 +172,41 @@ def t_sequential_and_probability():
     assert cl.loc[main, "pr_auc"] > cl.loc["persistence_rule_margin", "pr_auc"]
     ok("보정 확률이 사전확률·persistence 규칙 베이스라인을 상회")
 
+def t_v2_recipe_and_duplicates():
+    """v2 레시피(잔차타깃)가 수준값으로 올바로 복원되는지 + 중복일이 주 구간을 오염시키지 않는지."""
+    q, mode = FT.build(use_external=False)
+    d = FT.common_rows(q, mode)
+    sl = d.iloc[:4000]
+    F = FT.CORE
+    lvl = MD.fit_predict_point("hgb", CFG["seed"], sl[F].values, sl.y_h4.values,
+                               sl.kw.values, sl[F].values[:200], sl.kw.values[:200],
+                               recipe="v2_a5")
+    # 잔차 복원이 빠지면 예측이 0 근처가 된다 — 수준 스케일인지 확인
+    assert lvl.mean() > 0.5 * sl.kw.values[:200].mean(), "잔차 복원 누락 의심"
+    v1 = MD.fit_predict_point("hgb", CFG["seed"], sl[F].values, sl.y_h4.values,
+                              sl.kw.values, sl[F].values[:200], sl.kw.values[:200],
+                              recipe="v1")
+    assert np.abs(lvl - v1).mean() > 1e-9, "v1/v2 레시피가 동일 결과 — 분기 미작동"
+    ok("v2 잔차타깃 레시피 수준값 복원 + v1 분기 동작")
+
+    b = IN.load()
+    assert all(b["models"][h].get("point_recipe") == CFG["forecast"].get("point_recipe", "v2_a5")
+               for h in (1, 2, 3, 4)), "배포 artifact 레시피 플래그 불일치"
+    ok("배포 artifact 가 평가와 동일한 point_recipe 를 기록")
+
+    # 중복일(합성 증강)이 주 보고 구간 fold 의 TRAIN/TEST 양쪽에 걸치지 않는다
+    f = pd.read_csv(HERE.parents[1] / "analysis/tables/31_duplicate_fold_crossing.csv",
+                    encoding="utf-8-sig")
+    clean_folds = f[f.test_all_in_clean.astype(str).str.lower().isin(["true", "1"])]
+    assert len(clean_folds) >= 1, "clean 구간을 TEST 로 쓰는 fold 가 없다"
+    assert (clean_folds.n_dup_groups_crossing == 0).all(), "주 보고 구간 fold 에 중복일 교차 존재"
+    ok(f"주 보고 구간 fold {list(clean_folds.fold)} 의 중복일 TRAIN/TEST 교차 0건")
+
+
 if __name__ == "__main__":
     for f in [t_targets_and_leakage, t_temporal_protocol, t_reliability_and_peak,
               t_operator_output, t_artifacts_and_determinism, t_core_fallback,
-              t_sequential_and_probability]:
+              t_sequential_and_probability, t_v2_recipe_and_duplicates]:
         print(f.__name__)
         f()
     print("\nALL ACCEPTANCE TESTS PASSED")

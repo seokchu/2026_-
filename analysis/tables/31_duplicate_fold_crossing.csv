@@ -1,0 +1,6 @@
+﻿fold,n_train_days,n_test_days,n_dup_groups_crossing,test_start,test_end,test_all_in_clean
+0,42,43,23,2021-02-18,2021-04-01,False
+1,84,42,1,2021-04-01,2021-05-12,False
+2,125,43,28,2021-05-12,2021-06-23,False
+3,167,43,7,2021-06-23,2021-08-04,False
+4,209,42,0,2021-08-04,2021-09-14,True

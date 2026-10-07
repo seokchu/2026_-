@@ -28,6 +28,7 @@ def regime_rule(df, ramp_cut):
 def run_evaluation(d, mode, cfg):
     """OOF 행 테이블 + 모드선택 로그 + CAL 경보임계 + 레짐 비교를 만든다."""
     seed = cfg["seed"]
+    RECIPE = cfg["forecast"].get("point_recipe", "v2_a5")
     rcfg, pcfg = cfg["reliability"], cfg["policy"]
     sets = FT.feature_sets(mode)
     rule = cfg["external"]["selection_rule"]
@@ -68,8 +69,9 @@ def run_evaluation(d, mode, cfg):
             ytr, yca = TR[ycol].values, CA[ycol].values
             cal_pred, metr = {}, {}
             for mname, F in sets.items():
-                m = MD.point_model(cfg["forecast"]["point_model"], seed).fit(TR[F].values, ytr)
-                pc = m.predict(CA[F].values)
+                pc = MD.fit_predict_point(cfg["forecast"]["point_model"], seed,
+                                          TR[F].values, ytr, TR.kw.values,
+                                          CA[F].values, CA.kw.values, RECIPE)
                 cal_pred[mname] = pc
                 pk = CA[ycol].values >= CA.thr_adaptive.values
                 metr[mname] = dict(cal_mae=float(np.abs(yca - pc).mean()),
@@ -106,28 +108,36 @@ def run_evaluation(d, mode, cfg):
             # 선택 확정 후 TRAIN+CAL 로 재적합 (TEST 미사용).
             # 두 모드 모두 같은 적합집합으로 재적합해 CORE vs PUBLIC 비교를 공정하게 만든다.
             fit_idx = np.r_[tr, ca]
-            fitted = {}
+            FITD = d.iloc[fit_idx]
             for mname, Fm in sets.items():
-                fitted[mname] = MD.point_model(cfg["forecast"]["point_model"], seed).fit(
-                    d.iloc[fit_idx][Fm].values, d.iloc[fit_idx][ycol].values)
-                rec[f"pred_{mname}_h{h}"] = fitted[mname].predict(TE[Fm].values)
-            F, mfin = sets[chosen], fitted[chosen]
+                rec[f"pred_{mname}_h{h}"] = MD.fit_predict_point(
+                    cfg["forecast"]["point_model"], seed, FITD[Fm].values,
+                    FITD[ycol].values, FITD.kw.values, TE[Fm].values, TE.kw.values, RECIPE)
+            F = sets[chosen]
             rec[f"pred_h{h}"] = rec[f"pred_{chosen}_h{h}"].values
             rec[f"mode_h{h}"] = chosen
 
             # ---- Module C: CQR 구간 + 신뢰도 밴드 + OOD
+            # 분위모델/conformal 도 점예측과 같은 스케일(잔차)에서 적합한다.
+            # 스케일이 다르면 구간이 개선된 점예측을 중심으로 놓이지 않는다.
+            rbase_tr = TR.kw.values if RECIPE != "v1" else 0.0
+            rbase_ca = CA.kw.values if RECIPE != "v1" else 0.0
+            rbase_te = TE.kw.values if RECIPE != "v1" else 0.0
             if rcfg.get("conformal_groups") == "level3":
                 # 조건부(Mondrian) 보정: 현재 수요의 TRAIN 3분위 구간별 보정분위 (후속 R 근거)
                 lvl_cuts = np.quantile(TR.kw, [1 / 3, 2 / 3])
                 gcal = np.digitize(CA.kw.values, lvl_cuts)
                 gte_ = np.digitize(TE.kw.values, lvl_cuts)
                 lo, hi, cal_width, _ = MD.fit_cqr_grouped(
-                    TR[F].values, ytr, CA[F].values, yca, TE[F].values, gcal, gte_,
+                    TR[F].values, ytr - rbase_tr, CA[F].values, yca - rbase_ca,
+                    TE[F].values, gcal, gte_,
                     *rcfg["quantile_levels"], rcfg["conformal_alpha"], seed)
             else:
-                lo, hi, cal_width, _ = MD.fit_cqr(TR[F].values, ytr, CA[F].values, yca,
-                                                  TE[F].values, *rcfg["quantile_levels"],
+                lo, hi, cal_width, _ = MD.fit_cqr(TR[F].values, ytr - rbase_tr, CA[F].values,
+                                                  yca - rbase_ca, TE[F].values,
+                                                  *rcfg["quantile_levels"],
                                                   rcfg["conformal_alpha"], seed)
+            lo, hi = lo + rbase_te, hi + rbase_te       # 잔차 -> 수준 복원 (폭은 불변)
             cv, ood_cut = MD.ood_scorer(TR[F].values, rcfg["ood_quantile"])
             maha = cv.mahalanobis(TE[F].values)
             rec[f"int_lo_h{h}"], rec[f"int_hi_h{h}"] = lo, hi
@@ -137,7 +147,9 @@ def run_evaluation(d, mode, cfg):
             if h == 4:
                 rec["ood_maha"], rec["ood_cut_train"] = maha, ood_cut
             # ---- 경보 임계: 분위 -> 값 변환을 CAL 예측분포에서만 수행
-            pc_fin = mfin.predict(CA[F].values)
+            pc_fin = MD.fit_predict_point(cfg["forecast"]["point_model"], seed,
+                                          FITD[F].values, FITD[ycol].values, FITD.kw.values,
+                                          CA[F].values, CA.kw.values, RECIPE)
             for qv in pcfg["threshold_grid"]:
                 thr_rows.append(dict(fold=fi, horizon_min=h * 15, q=qv,
                                      threshold_kw=float(np.quantile(pc_fin, qv))))

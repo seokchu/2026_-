@@ -10,6 +10,9 @@ data:
 forecast:
   horizons_min: [15, 30, 45, 60]
   point_model: hgb            # HistGradientBoostingRegressor
+  # v2 점예측 레시피: 잔차타깃(y-kw_t) + SERA 계열 극단가중 + 주기인코딩 + 휴무/재가동 특성
+  # 근거: analysis/tables/31_v2_clean_summary.csv, 31_v2_clean_bootstrap.csv (A5 vs A0)
+  point_recipe: v2_a5         # 'v1' 로 두면 종전(수준타깃·무가중) 동작
   eval_baselines: [persistence, ridge, rf, hgb]
 
 external:
@@ -33,6 +36,11 @@ regime:
   ramp_quantile: 0.9
   compare_methods: [gmm3]         # 진단용 견고성 비교
 
+# 피크 임계 근거: 한전 요금적용전력은 15분 평균전력의 '월 최대 1점'(검침 당월 포함
+# 직전 12개월 중 7~9월·12~2월분 최대). 따라서 ① 15분 해상도 ② 직전 ~30일(검침월) 창이
+# 과금 주기와 정합. 단 '월 최대 1점'을 라벨로 쓰면 월당 양성 1건 -> 학습·평가 불가하므로
+# p95 는 '학습 가능한 양성 표본 확보'를 위한 모델링 선택이다(요금 규칙 아님).
+# 창길이/분위 민감도: analysis/tables/31_peak_threshold_sensitivity.csv
 peak:
   window_days: 30
   quantile: 0.95                  # 직전 30일 p95 (적응형·leak-free)
@@ -45,6 +53,9 @@ policy:
   gates: [none, advisory_if_unsure, confirm_only_if_unsure]
   cost_ratios: [1, 2, 5, 10, 20, 50, 100]
   default_cost_ratio: 10          # 기본 시연값. 보편 최적 아님
+  # 선행시간 근거: 한전 수요시한 15분(기존 제어기가 커버), KPX 수요자원 거래시장은
+  # 감축요청을 1시간 전 통보하고 부족분을 30분 내 추가 요청 -> h60 주, 30분이 하한.
+  # 출처표: analysis/tables/31_leadtime_basis.csv
   minimum_lead_minutes: 30
   operator_advisory_capacity: 12   # 일 권고 건수 상한(운영 부담 기준선)
 

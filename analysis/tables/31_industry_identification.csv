@@ -1,0 +1,4 @@
+﻿field,value,evidence,source,url,confidence
+업종,선박엔진용 볼트·너트 제조 (금속 패스너),"KAMP 자원 최적화 AI 데이터셋 설명 — 1개 공장(선박엔진용 볼트·너트), 2021-01-01~09-14, 257일×24시간 = 6,168행×18열",KAMP 데이터셋 설명 / 동일 데이터 사용 공개 저장소 2건 교차확인,https://github.com/junseo0im/fac-power-forecast,2개 독립 출처 일치. 원 데이터 파일 자체에는 업종 표기 없음
+데이터 출처 표기,"중소벤처기업부·KAMP·자원 최적화 AI 데이터셋·KAIST(울산과학기술원, ㈜유피시앤에스), 2021.12.27.",데이터셋 공식 출처 문구,KAMP,https://www.kamp-ai.kr/,인용 문구 그대로
+주요 전력부하 공정,유도가열(단조 전 예열)·열처리(소입/소려)·가공,패스너 제조에서 유도가열은 단조 전 예열과 열처리에 사용되며 수 초 내 단조온도 도달,Inductotherm / Ajax TOCCO 산업 자료,https://inductothermgroup.com/wp-content/uploads/Induction-Heating-and-Heat-Treating-of-Fasteners_2019.pdf,업종 일반론. 본 공장 설비구성은 데이터에 없음 → 설비단위 주장 불가

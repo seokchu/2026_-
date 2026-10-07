@@ -34,6 +34,8 @@ def predict(rows, bundle=None, early_q=None, confirm_q=None):
         m = b["models"][h]
         X = rows[m["features"]].values
         p = m["point"].predict(X)
+        if m.get("point_recipe", "v1") != "v1":
+            p = p + rows.kw.values            # 잔차타깃 -> 수준값 복원
         raw_lo, raw_hi = m["q_lo"].predict(X), m["q_hi"].predict(X)
         spec = m.get("conformal_spec", {"mode": "global", "global_Q": m["conformal_Q"]})
         if spec.get("mode") == "level3":
@@ -46,6 +48,8 @@ def predict(rows, bundle=None, early_q=None, confirm_q=None):
             qarr = np.full(len(rows), float(spec.get("global_Q", m["conformal_Q"])))
         lo = raw_lo - qarr
         hi = raw_hi + qarr
+        if m.get("point_recipe", "v1") != "v1":
+            lo, hi = lo + rows.kw.values, hi + rows.kw.values   # 잔차 -> 수준 복원
         w = hi - lo
         maha = m["ood"].mahalanobis(X)
         c0, c1 = m["band_cuts"]

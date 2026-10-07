@@ -26,17 +26,33 @@ python3 analysis/final_baseline/test_baseline.py                                
 후속 검증·1차 모의평가 대응 스크립트: `analysis/final_baseline/followup_*.py`, `sequential_policy.py`,
 `peak_probability.py`, `error_conditions.py`.
 
-## 핵심 성능 (원본구간 7~9월, rolling-origin OOF)
+## 핵심 성능 (원본구간 7~9월, rolling-origin OOF) — v2
 
-| 항목 | 값 |
-|---|---|
-| MAE h15 / h60 | **5.668 / 8.764 kw** (persistence 대비 −28.3% / −47.9%) |
-| h60 베이스라인 | persistence 16.827 / Ridge 15.461 / RF 9.445 / HGB 8.764 |
-| 피크 초과 확률 h60 | PR-AUC 0.357 · F1 0.444 · Brier 0.0523 · ECE 0.0460 |
-| 신뢰도 밴드 h60 MAE | HIGH 4.70 / MEDIUM 12.60 / LOW 13.85 (OOD 9.34) |
-| 구간 coverage h60 | 0.867 (피크구간 0.234 — 조건부 보정으로 0.119에서 개선) |
-| 경보(선행 ≥30분 제약) | h60 q0.78 → h45 q0.90: 포착 0.529 · 선행 45분 · 오경보 5.0 스텝/일 |
-| 작업자 검토율 | 11.98% (11.5건/일), 금지 문구 0건 |
+| 항목 | v1.1 | **v2** |
+|---|---|---|
+| MAE h15 / h60 | 5.668 / 8.764 kw | **5.094 / 7.907 kw** (persistence 대비 −35.6% / −53.0%) |
+| 고사용량 구간 MAE h60 (ablation 기준) | 20.878 | **15.649 kw (−25.0%)** |
+| 구간 coverage h60 (전체 / 피크구간) | 0.867 / 0.234 | **0.872 / 0.556** |
+| 평균 구간폭 h60 | — | **39.87 kw** |
+| 신뢰도 밴드 h60 MAE | 4.70 / 12.60 / 13.85 | **4.72 / 10.32 / 13.58** (OOD 5.80) |
+| 사건 포착 / 오경보 / 평균 선행 | — | **0.884 / 3.21 스텝·일 / 43.2분** |
+| 작업자 검토율 / 정보부족 비율 | 11.98% | **22.74% / 14.04%** |
+
+v2 에서 바꾼 것: 잔차 타깃(`y−kw(t)`) · 푸리에 주기 인코딩 · SERA 계열 극단 가중 ·
+휴무/재가동 특성. 분위모델과 conformal 보정도 같은 잔차 스케일로 옮겼다
+(→ 피크구간 coverage 0.234 → 0.556).
+근거: [`analysis/reports/32_V2_FORECAST_IMPROVEMENT.md`](analysis/reports/32_V2_FORECAST_IMPROVEMENT.md),
+표 `analysis/tables/31_*.csv`.
+
+## 제출물 생성
+
+```bash
+python3 analysis/submission/rebuild_all.py        # 표·그림·보고서·발표자료 전부 재생성
+python3 analysis/submission/make_submission.py    # 예측결과 파일 + 소스코드 zip
+```
+- 결과보고서: `submission/결과보고서_전력피크조기경보.hwpx` (주최측 양식 자동 채움)
+- 발표자료: `submission/발표자료_전력피크조기경보.pptx`
+- 수치는 전부 `analysis/tables/*.csv` 에서 읽어 생성한다. 손으로 옮겨 적지 않는다.
 
 ## 하지 않는 주장
 

@@ -80,3 +80,23 @@ def bands(width, cal_width, band_q, maha, ood_cut):
     return np.where(maha > ood_cut, "OOD",
                     np.where(width <= cuts[0], "HIGH",
                              np.where(width <= cuts[1], "MEDIUM", "LOW")))
+
+
+# ---- v2 점예측 레시피 (31_v2_ablation: A1 잔차타깃 + A3 극단가중)
+def relevance_weight(y_fit, lam=4.0):
+    """SERA 계열 relevance 가중. 적합집합(TRAIN+CAL)의 분위에서만 산출한다."""
+    lo, hi = np.quantile(y_fit, [.90, .995])
+    return 1.0 + lam * np.clip((y_fit - lo) / max(hi - lo, 1e-6), 0, 1)
+
+
+def fit_predict_point(kind, seed, Xf, yf, base_f, Xt, base_t, recipe="v2_a5"):
+    """잔차타깃 + 극단가중으로 적합하고 TEST 예측을 수준값으로 되돌린다.
+
+    recipe='v1' 이면 종전과 동일(수준 타깃, 가중 없음).
+    base_* 는 결정시점 수요 kw (잔차 기준선). TEST 라벨은 쓰지 않는다.
+    """
+    if recipe == "v1":
+        return point_model(kind, seed).fit(Xf, yf).predict(Xt)
+    w = relevance_weight(yf)
+    m = point_model(kind, seed).fit(Xf, yf - base_f, sample_weight=w)
+    return m.predict(Xt) + base_t

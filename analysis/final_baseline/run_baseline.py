@@ -72,14 +72,24 @@ def deployment_fit(d, cons, cfg, art_dir, bp):
     for h in H:
         F = FT.CORE if mode_by_h[h * 15] == "CORE" else FT.PUBLIC
         ycol = f"y_h{h}"
-        pt = MD.point_model(cfg["forecast"]["point_model"], seed).fit(d[F].values, d[ycol].values)
+        recipe = cfg["forecast"].get("point_recipe", "v2_a5")
+        if recipe == "v1":
+            pt = MD.point_model(cfg["forecast"]["point_model"], seed).fit(d[F].values,
+                                                                         d[ycol].values)
+        else:  # 잔차타깃 + 극단가중: 예측값에 결정시점 kw 를 다시 더해야 한다
+            w = MD.relevance_weight(d[ycol].values)
+            pt = MD.point_model(cfg["forecast"]["point_model"], seed).fit(
+                d[F].values, d[ycol].values - d.kw.values, sample_weight=w)
+        rb_tr = TR.kw.values if recipe != "v1" else 0.0
+        rb_ca = CA.kw.values if recipe != "v1" else 0.0
+        ytr_r, yca_r = TR[ycol].values - rb_tr, CA[ycol].values - rb_ca
         conformal_mode = rcfg.get("conformal_groups", "none")
         if conformal_mode == "level3":
             level_cuts = np.quantile(TR.kw.values, [1 / 3, 2 / 3])
             gcal = np.digitize(CA.kw.values, level_cuts)
             gprobe = np.digitize(CA.kw.values[:1], level_cuts)
             _, _, cal_width, (m_lo, m_hi, Qs, Qg) = MD.fit_cqr_grouped(
-                TR[F].values, TR[ycol].values, CA[F].values, CA[ycol].values,
+                TR[F].values, ytr_r, CA[F].values, yca_r,
                 CA[F].values[:1], gcal, gprobe,
                 *rcfg["quantile_levels"], rcfg["conformal_alpha"], seed)
             conformal_spec = dict(
@@ -90,16 +100,16 @@ def deployment_fit(d, cons, cfg, art_dir, bp):
             Q_compat = float(Qg)
         else:
             _, _, cal_width, (m_lo, m_hi, Q) = MD.fit_cqr(
-                TR[F].values, TR[ycol].values, CA[F].values, CA[ycol].values,
+                TR[F].values, ytr_r, CA[F].values, yca_r,
                 CA[F].values[:1], *rcfg["quantile_levels"],
                 rcfg["conformal_alpha"], seed)
             conformal_spec = dict(mode="global", global_Q=float(Q))
             Q_compat = float(Q)
 
         cv, ood_cut = MD.ood_scorer(TR[F].values, rcfg["ood_quantile"])
-        cal_pred = pt.predict(CA[F].values)
+        cal_pred = pt.predict(CA[F].values) + rb_ca   # 잔차 -> 수준 복원
         bundle["models"][h] = dict(
-            features=F, point=pt, q_lo=m_lo, q_hi=m_hi,
+            features=F, point=pt, point_recipe=recipe, q_lo=m_lo, q_hi=m_hi,
             conformal_Q=Q_compat, conformal_spec=conformal_spec,
             band_cuts=[float(x) for x in np.quantile(cal_width, rcfg["band_width_quantiles"])],
             ood=cv, ood_cut=ood_cut,
