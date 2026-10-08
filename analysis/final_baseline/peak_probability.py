@@ -6,7 +6,9 @@
 
 프로토콜(평가와 동일): 폴드별 TRAIN(분류기 학습) / CAL(isotonic 보정 + 운영임계 선택) / TEST(적용).
 TEST 라벨은 어떤 적합·선택에도 쓰지 않는다.
-베이스라인 5종: persistence 규칙 / 회귀점수 임계 / HGB 분류기(미보정) / RF 분류기(미보정) / 사전확률.
+베이스라인: persistence 규칙 / 회귀점수 임계 / HGB 분류기 / ExtraTrees 분류기 / 사전확률.
+주 모델은 RandomForest(표준 벤치마크 34 에서 F1·MCC 최고). isotonic 보정도 함께 산출해
+개선 여부를 표에 남긴다 — 본 데이터에서는 RF 가 이미 충분히 보정되어 isotonic 이 Brier 를 악화시킨다.
 """
 import sys
 from pathlib import Path
@@ -28,7 +30,7 @@ plt = mpl()
 cfg = yaml.safe_load((HERE / "config.yaml").read_text(encoding="utf-8"))
 SEED = cfg["seed"]
 H = [1, 2, 3, 4]
-GRID = np.round(np.arange(.02, .99, .02), 3)      # 운영임계 후보(확률)
+GRID = np.round(np.arange(.005, .995, .005), 4)   # 운영임계 후보(확률). CAL 에서만 고른다
 
 
 def ece(y, p, bins=10):
@@ -75,11 +77,11 @@ for h in H:
         ytr, yca, yte = lab[tr], lab[ca], lab[te]
         if ytr.sum() < 20 or yca.sum() < 5:
             continue
-        # --- 주 모델: ExtraTrees(class_weight=balanced) + CAL isotonic 보정
-        #     선정 근거: 33_model_compare_alert_clean.csv — 경보 용량 제약 하 clean F1 최대
-        et = ExtraTreesClassifier(n_estimators=400, min_samples_leaf=2,
-                                  class_weight="balanced", n_jobs=-1,
-                                  random_state=SEED).fit(Xtr, ytr)
+        # --- 주 모델: RandomForest + CAL isotonic 보정
+        #     선정 근거: 34_standard_benchmark_alert_clean.csv — 표준 분류모델 12종 중
+        #     F1·MCC 최고(F1 0.512 / MCC 0.510). 클래스 가중은 오히려 악화되어 쓰지 않는다.
+        et = RandomForestClassifier(n_estimators=400, min_samples_leaf=2, n_jobs=-1,
+                                    random_state=SEED).fit(Xtr, ytr)
         p_ca_raw, p_te_raw = et.predict_proba(Xca)[:, 1], et.predict_proba(Xte)[:, 1]
         iso = IsotonicRegression(out_of_bounds="clip").fit(p_ca_raw, yca)
         p_te_cal = iso.predict(p_te_raw)
@@ -87,10 +89,8 @@ for h in H:
         # --- 베이스라인
         clf = HistGradientBoostingClassifier(random_state=SEED).fit(Xtr, ytr)
         p_ca_hgb, p_te_hgb = clf.predict_proba(Xca)[:, 1], clf.predict_proba(Xte)[:, 1]
-        # 비교 공정성: 33_model_compare 와 동일 설정(400 트리, class_weight 균형)
-        rf = RandomForestClassifier(n_estimators=400, min_samples_leaf=2, n_jobs=-1,
-                                    class_weight="balanced_subsample",
-                                    random_state=SEED).fit(Xtr, ytr)
+        rf = ExtraTreesClassifier(n_estimators=400, min_samples_leaf=2, n_jobs=-1,
+                                  random_state=SEED).fit(Xtr, ytr)
         p_te_rf = rf.predict_proba(Xte)[:, 1]
         reg = MD.point_model("hgb", SEED).fit(Xtr, d.iloc[tr][ycol].values)
         s_te_reg = reg.predict(Xte) - d.iloc[te].thr_adaptive.values      # 회귀 여유 점수
@@ -100,10 +100,10 @@ for h in H:
         prior = float(ytr.mean())
 
         cands = {
-            "ET_clf_isotonic(main)": (p_ca_cal, p_te_cal, True),
-            "ET_clf_uncalibrated": (p_ca_raw, p_te_raw, True),
+            "RF_clf(main)": (p_ca_raw, p_te_raw, True),
+            "RF_clf_isotonic": (p_ca_cal, p_te_cal, True),
             "HGB_clf_uncalibrated": (p_ca_hgb, p_te_hgb, True),
-            "RF_clf_uncalibrated": (rf.predict_proba(Xca)[:, 1], p_te_rf, True),
+            "ET_clf_uncalibrated": (rf.predict_proba(Xca)[:, 1], p_te_rf, True),
             "regression_margin_score": (s_ca_reg, s_te_reg, False),
             "persistence_rule_margin": (s_ca_pers, s_te_pers, False),
             "prior_constant": (np.full(len(yca), prior), np.full(len(yte), prior), True)}
@@ -163,7 +163,7 @@ print(cl[["horizon_min", "score", "prevalence", "pr_auc", "f1", "precision", "re
 
 fig, axes = plt.subplots(1, 2, figsize=(11, 3.8))
 rc = pd.DataFrame(rel_rows)
-for name, mk in [("ET_clf_isotonic(main)", "o-"), ("ET_clf_uncalibrated", "s--")]:
+for name, mk in [("RF_clf(main)", "o-"), ("RF_clf_isotonic", "s--")]:
     s = rc[(rc.score == name) & (rc.horizon_min == 60)].groupby("bin").agg(
         mean_pred=("mean_pred", "mean"), observed_rate=("observed_rate", "mean")).reset_index()
     axes[0].plot(s.mean_pred, s.observed_rate, mk, label=name, ms=4)
@@ -173,11 +173,11 @@ axes[0].set_title("신뢰도 곡선 (h60, 원본구간)"); axes[0].legend(fontsi
 x = np.arange(len(cl.score.unique()))
 for i, hm in enumerate([15, 60]):
     s = cl[cl.horizon_min == hm].set_index("score").reindex(
-        ["ET_clf_isotonic(main)", "ET_clf_uncalibrated", "HGB_clf_uncalibrated", "RF_clf_uncalibrated",
+        ["RF_clf(main)", "RF_clf_isotonic", "HGB_clf_uncalibrated", "ET_clf_uncalibrated",
          "regression_margin_score", "persistence_rule_margin", "prior_constant"])
     axes[1].bar(x + (i - .5) * .4, s.f1.values, .4, label=f"h{hm}")
 axes[1].set_xticks(x); axes[1].set_xticklabels(
-    ["ET+iso(main)", "ET raw", "HGB", "RF", "회귀여유", "persistence", "사전확률"],
+    ["RF(main)", "RF+iso", "HGB", "ET", "회귀여유", "persistence", "사전확률"],
     rotation=20, ha="right", fontsize=6)
 axes[1].set_ylabel("F1"); axes[1].legend(fontsize=7); axes[1].set_title("분류 베이스라인 비교 (원본구간)")
 fig.suptitle("FIGURE 7. 운영상 피크 초과 확률 — 보정과 분류 성능 (고장·과금 확률 아님)", fontsize=9)

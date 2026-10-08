@@ -35,9 +35,13 @@ STR = L("31_v2_stress_map")
 MCR, MSC, MSB = L("33_model_compare_regression"), L("33_select_regression_clean"), L("33_select_regression_bootstrap")
 MCA, FDG = L("33_model_compare_alert_clean"), L("33_f1_ceiling_diagnosis")
 PKP = L("28_peak_probability_summary")
+RSTD, CSTD = L("34_standard_benchmark_regression_clean"), L("34_standard_benchmark_alert_clean")
+OURS_R = "HistGBM + 극단가중 (제출 모델)"
+r_ours = RSTD[RSTD.model == OURS_R].iloc[0]
+c_best = CSTD.sort_values("f1", ascending=False).iloc[0]
 pk60 = PKP[(PKP.window == "clean_Jul_Sep") & (PKP.horizon_min == 60)].set_index("score")
 pk15 = PKP[(PKP.window == "clean_Jul_Sep") & (PKP.horizon_min == 15)].set_index("score")
-f1_now, f1_pers = float(pk60.loc["ET_clf_isotonic(main)", "f1"]), float(pk60.loc["persistence_rule_margin", "f1"])
+f1_now, f1_pers = float(pk60.loc["RF_clf(main)", "f1"]), float(pk60.loc["persistence_rule_margin", "f1"])
 f1_ceil = float(FDG[FDG.model == "R4_hist_gbm"].oracle_f1_same_error.iloc[0])
 bias_pk = float(FDG[FDG.model == "R4_hist_gbm"].bias_peak.iloc[0])
 above = float(FDG[FDG.model == "R4_hist_gbm"].peak_pred_above_thr.iloc[0])
@@ -112,7 +116,25 @@ C2 = [
  (2, "임계·보정계수·샘플가중·스케일러·OOD 컷·특성모드 선택을 전부 TRAIN(+CAL)에서만 적합한다. TEST 는 적용만 한다."),
  (2, "랜덤 분할을 쓰지 않는다. 주 보고 구간은 clean_Jul_Sep(OOF 7,289 스텝, 고사용량 419 스텝)."),
  (2, "수치 예측 성능(MAE·RMSE·고사용량 구간 MAE)과 경고 성능(FN·FP·F1)을 하나의 점수로 섞지 않는다."),
- (1, "비교한 모델"),
+ (1, "표준 모델·표준 지표 벤치마크 — 먼저 통용되는 기준으로 위치를 확인한다"),
+ (2, "회귀 15종: Naive(직전값) / Seasonal naive(24시간 전) / Linear Regression / Ridge / Lasso / ElasticNet / k-NN / SVR(RBF) / Decision Tree / Random Forest / Extra Trees / Gradient Boosting / HistGradientBoosting / MLP / 제출 모델(HistGBM + 극단가중)."),
+ (2, "지표도 표준만 쓴다: MAE, RMSE, MAPE, sMAPE, MASE, R². MASE 는 학습구간 Seasonal naive(24시간) 오차로 정규화한 값이라 단위에 의존하지 않는다."),
+] + [
+ (2, f"{r.model}: MAE {r.mae:.3f} / RMSE {r.rmse:.3f} / MAPE {r.mape:.2f}% / sMAPE {r.smape:.2f}% / MASE {r.mase:.3f} / R² {r.r2:.3f} / 고사용량 MAE {r.mae_peak:.3f}")
+ for _, r in RSTD.sort_values("mae").iterrows()
+] + [
+ (3, f"제출 모델은 MAE 기준 4위이지만 고사용량 구간 MAE 는 {r_ours.mae_peak:.3f} kw 로 15종 중 가장 낮다. 과제가 고사용량 판정이므로 이 기준으로 골랐다(아래 선정 절차)."),
+ (3, f"표준 지표로 읽으면 MAPE {r_ours.mape:.2f}%, MASE {r_ours.mase:.3f}, R² {r_ours.r2:.3f} 이다. MASE 1 미만은 24시간 전 값을 그대로 쓰는 것보다 낫다는 뜻이다."),
+ (1, "표준 분류 모델 13종 — 고사용량 경보"),
+ (2, "Majority class(전부 정상) / Naive rule(현재값>임계) / Logistic Regression / Gaussian Naive Bayes / k-NN / SVM(RBF) / Decision Tree / Random Forest / Extra Trees / Extra Trees+클래스가중 / Gradient Boosting / HistGradientBoosting / MLP."),
+ (2, "지표: Accuracy, Precision, Recall, Specificity, Balanced Accuracy, F1, MCC, ROC-AUC, PR-AUC, Brier."),
+] + [
+ (2, f"{r.model}: 정확도 {r.accuracy:.3f} / 정밀도 {r.precision:.3f} / 재현율 {r.recall:.3f} / 특이도 {r.specificity:.3f} / 균형정확도 {r.balanced_accuracy:.3f} / F1 {r.f1:.3f} / MCC {r.mcc:.3f} / PR-AUC {r.pr_auc:.3f}")
+ for _, r in CSTD.sort_values("f1", ascending=False).iterrows()
+] + [
+ (3, "정확도는 이 문제에서 의미가 작다. 전부 '정상'으로 답해도 0.943 이 나온다. F1 과 MCC 로 읽어야 한다."),
+ (3, f"Random Forest 가 F1 {c_best.f1:.3f}, MCC {c_best.mcc:.3f} 로 동시 최고다. 클래스 가중을 주면 F1 이 0.453 으로 떨어져 쓰지 않는다."),
+ (1, "그다음에 본 과제 고유 비교 — 점진 개선과 기준선"),
  (2, "기준선 B0 직전값 지속(persistence), B1 Ridge, B2 RandomForest."),
  (2, "주 모델 A0 HistGradientBoosting(기본). 여기에 네 가지 개선을 하나씩 더한 A1~A4, 전부 결합한 A5."),
  (3, "A1 잔차 타깃 — y(t+h) 대신 y(t+h) − kw(t) 를 학습하고 예측 시 kw(t) 를 더한다. 트리 모델이 수준 외삽에 약한 문제를 피한다."),
@@ -174,7 +196,7 @@ C2 = [
  (2, "선정 규칙: 경보 12건/일 이하인 후보 중 clean F1 최대, 동점 시 사건 recall. 용량 제약은 본 실험 이전부터 config.yaml 에 있던 값이다."),
  (2, f"선택: {CNAME[win_c.model]} (F1 {win_c.f1:.3f}, 사건 recall {win_c.event_recall:.3f}, {win_c.alerts_per_day:.1f}건/일). HistGBM 은 12.4건/일로 용량 제약 위반."),
  (3, "스태킹은 전 구간 F1 0.477 로 상위였으나 clean 구간에서 0.251 로 붕괴했다. 스태커가 중복일이 섞인 앞쪽 fold 에 과적합했다. 전 구간 수치만 봤다면 잘못 골랐을 것이다."),
- (2, f"주 분류기를 HistGBM+isotonic 에서 ExtraTrees+isotonic 으로 교체했다. clean h60 F1 {float(pk60.loc['HGB_clf_uncalibrated','f1']):.3f} → {f1_now:.3f}, Brier {float(pk60.loc['HGB_clf_uncalibrated','brier']):.4f} → {float(pk60.loc['ET_clf_isotonic(main)','brier']):.4f}, ECE {float(pk60.loc['HGB_clf_uncalibrated','ece']):.4f} → {float(pk60.loc['ET_clf_isotonic(main)','ece']):.4f}. h15 은 F1 {float(pk15.loc['ET_clf_isotonic(main)','f1']):.3f}."),
+ (2, f"주 분류기를 HistGBM+isotonic 에서 RandomForest+isotonic 으로 교체했다. clean h60 F1 {float(pk60.loc['HGB_clf_uncalibrated','f1']):.3f} → {f1_now:.3f}, Brier {float(pk60.loc['HGB_clf_uncalibrated','brier']):.4f} → {float(pk60.loc['RF_clf(main)','brier']):.4f}, ECE {float(pk60.loc['HGB_clf_uncalibrated','ece']):.4f} → {float(pk60.loc['RF_clf(main)','ece']):.4f}. h15 은 F1 {float(pk15.loc['RF_clf(main)','f1']):.3f}."),
  (1, "최종 모델 선택 이유"),
  (2, "A5 를 최종 모델로 선택했다. 네 호라이즌 모두에서 MAE 와 고사용량 구간 MAE 가 동시에 개선되었고, 블록 부트스트랩으로 유의했으며, 개선의 출처가 네 가지 개별 요소로 분해되어 설명 가능하기 때문이다."),
  (2, "선택 규칙은 실험 전에 선언했다: '전 호라이즌에서 MAE 가 악화되지 않고 고사용량 구간 MAE 가 개선되며 블록 부트스트랩 CI 상한이 0 미만'. 돌려본 뒤 기준을 바꾸지 않았다."),

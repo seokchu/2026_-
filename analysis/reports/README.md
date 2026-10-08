@@ -4,7 +4,8 @@
 
 ## 읽는 순서
 0. `29_FINAL_SUBMISSION_REPORT.md` — **제출용 최종 결과보고서**(문제→데이터→모델→확률·신뢰도→경보→오류조건→현장→한계)
-0-0. `33_MODEL_SELECTION_AND_F1_AUDIT.md` — **모델 선정(회귀 6종·분류 9종) + F1 감사**(무편향 오라클 상한 0.693 vs 현재 0.468, 피크 편향 +14.75 kw 원인 특정)
+0-0. `34_STANDARD_BENCHMARK.md` — **표준 모델 15+13종 · 표준 지표(MAE/RMSE/MAPE/sMAPE/MASE/R², F1/MCC/PR-AUC) 벤치마크**. 외부 독자는 여기부터 읽는다
+0-0-0. `33_MODEL_SELECTION_AND_F1_AUDIT.md` — **모델 선정(회귀 6종·분류 9종) + F1 감사**(무편향 오라클 상한 0.693 vs 현재 0.468, 피크 편향 +14.75 kw 원인 특정)
 0-0-1. `32_V2_FORECAST_IMPROVEMENT.md` — **예측 성능 개선 v2**(업종·선행시간 근거 / 피크 임계 근거 / 합성 중복일 감사 / A0~A5 ablation / OOD 역할 재정의 / 배포 정합성). 제출물 생성: `analysis/submission/`
 0-1. `30_STATE_MODEL_AND_ERROR_AUDIT.md` — **상태별 모델 채택 여부(기각) / 오류분석 격하 / 필수 시각화**
 0-0b. `28_REVIEW_R1_RESPONSE.md` — **1차 모의평가 대응**(순차경보 재구현 / 정책선택 누수 제거 / 보정 확률 / FP·FN 조건, **철회된 주장 포함**)

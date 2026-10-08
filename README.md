@@ -26,50 +26,37 @@ python3 analysis/final_baseline/test_baseline.py                                
 후속 검증·1차 모의평가 대응 스크립트: `analysis/final_baseline/followup_*.py`, `sequential_policy.py`,
 `peak_probability.py`, `error_conditions.py`.
 
-## 핵심 성능 (원본구간 7~9월, rolling-origin OOF) — v2
+## 성능 — 표준 지표 (clean 7~9월, rolling-origin OOF, 1시간 전)
 
-| 항목 | v1.1 | **v2** |
-|---|---|---|
-| MAE h15 / h60 | 5.668 / 8.764 kw | **5.094 / 7.907 kw** (persistence 대비 −35.6% / −53.0%) |
-| 고사용량 구간 MAE h60 (ablation 기준) | 20.878 | **15.649 kw (−25.0%)** |
-| 구간 coverage h60 (전체 / 피크구간) | 0.867 / 0.234 | **0.872 / 0.556** |
-| 평균 구간폭 h60 | — | **39.87 kw** |
-| 신뢰도 밴드 h60 MAE | 4.70 / 12.60 / 13.85 | **4.72 / 10.32 / 13.58** (OOD 5.80) |
-| 사건 포착 / 오경보 / 평균 선행 | — | **0.884 / 3.21 스텝·일 / 43.2분** |
-| 작업자 검토율 / 정보부족 비율 | 11.98% | **22.74% / 14.04%** |
+| 수치 예측 | 값 | | 고사용량 경보 | 값 |
+|---|---:|---|---|---:|
+| MAE | 7.862 kw | | F1 | **0.478** (h15 0.532) |
+| RMSE | 12.572 | | MCC (표준 벤치마크 행집합) | 0.510 |
+| MAPE | 11.30 % | | 정밀도 / 재현율 | 0.357 / 0.776 |
+| sMAPE | 11.93 % | | PR-AUC | 0.396 |
+| **MASE** | **0.215** | | Brier | 0.0477 |
+| R² | 0.958 | | Naive rule 대비 | +57 % |
+| 고사용량 구간 MAE | **15.240 kw** (15종 중 최저) | | 무편향 F1 상한 | 0.693 |
 
-v2 에서 바꾼 것: 잔차 타깃(`y−kw(t)`) · 푸리에 주기 인코딩 · SERA 계열 극단 가중 ·
-휴무/재가동 특성. 분위모델과 conformal 보정도 같은 잔차 스케일로 옮겼다
-(→ 피크구간 coverage 0.234 → 0.556).
-근거: [`analysis/reports/32_V2_FORECAST_IMPROVEMENT.md`](analysis/reports/32_V2_FORECAST_IMPROVEMENT.md),
-표 `analysis/tables/31_*.csv`.
+MASE 1.0 = 24시간 전 값 그대로, 0.46 = 직전값 그대로. MCC 는 공통 특성 행집합(23,980행) 기준이고 나머지 경보 지표는 생산 구성(23,548행) 기준이다.
+정확도(Accuracy)는 쓰지 않는다 — 경보를 하나도 내지 않아도 0.943 이 나온다.
+ROC-AUC 도 발생률 5.75%에서 과대평가되므로 근거로 쓰지 않는다.
 
+## 표준 모델 벤치마크 (대회 요건: 베이스라인 포함 2개 이상 비교)
 
-## 경보 성능 — 숨기지 않고 적는 수치 (clean 7~9월, h60)
+- **회귀 15종** Naive · Seasonal naive · Linear · Ridge · Lasso · ElasticNet · k-NN · SVR(RBF) ·
+  Decision Tree · Random Forest · Extra Trees · Gradient Boosting · HistGBM · MLP · 제출 모델
+- **분류 13종** Majority · Naive rule · Logistic · Gaussian NB · k-NN · SVM(RBF) · Decision Tree ·
+  Random Forest · Extra Trees(+가중) · Gradient Boosting · HistGBM · MLP
+- 선정: 회귀는 **고사용량 구간 MAE 기준**(Extra Trees 가 전체 MAE 는 낮지만 고사용량 MAE 유의 악화 → 기각),
+  분류는 **F1·MCC 동시 최고인 Random Forest**
+- 표: `34_standard_benchmark_regression_clean.csv`, `34_standard_benchmark_alert_clean.csv`
+- 상세: [`analysis/reports/34_STANDARD_BENCHMARK.md`](analysis/reports/34_STANDARD_BENCHMARK.md)
 
-| 기준 | F1 |
-|---|---:|
-| 사전확률(모두 경보) | 0.111 |
-| persistence 규칙 | 0.305 |
-| 회귀 마진(점예측 그대로) | 0.322 |
-| 이전 주 모델 HGB | 0.434 |
-| **현재 ExtraTrees+isotonic** | **0.468** (h15 0.538) |
-| 무편향 오라클 상한 | 0.693 |
-| 완전 예측 | 1.000 |
+## 부가 분석 (고유)
 
-사건 단위 recall **0.903** (186 사건 중 168).
-**상한의 68% 지점이다. 좋다고 말하지 않는다.**
-원인은 고사용량 구간의 체계적 과소예측 **+14.75 kw** — 고사용량 스텝의 81.6%에서 점예측이 임계 미달.
-ROC-AUC 0.934 는 발생률 5.96%에서 과대평가되므로 근거로 쓰지 않는다.
-근거: [`analysis/reports/33_MODEL_SELECTION_AND_F1_AUDIT.md`](analysis/reports/33_MODEL_SELECTION_AND_F1_AUDIT.md)
-
-## 모델 선정 (대회 요건: 베이스라인 포함 2개 이상 비교)
-
-- **수치 예측** 6종 비교(persistence / Ridge / RandomForest / ExtraTrees / HistGBM / HistGBM-deep)
-  → ExtraTrees 가 전체 MAE 는 유의 개선이나 **고사용량 MAE 유의 악화(h60 +1.237, CI [+0.515, +1.911])**
-  → 사전 선언 조건 위반으로 **기각**, HistGBM 유지
-- **고사용량 경보** 9종 비교 → **ExtraTrees(balanced)+isotonic 채택** (F1 0.481, 사건 recall 0.903, 11.1건/일 ≤ 용량 12)
-- 표: `33_model_compare_regression.csv`, `33_model_compare_alert_clean.csv`, `33_model_selection_verdict.csv`, `33_f1_ceiling_diagnosis.csv`
+데이터 합성 복제일 감사 · 피크 편향으로 F1 상한 측정 · conformal 예측구간 · OOD 취약조건 지도 ·
+선행시간 제도 근거. 보고서 31~33 참조.
 
 ## 제출물 생성
 

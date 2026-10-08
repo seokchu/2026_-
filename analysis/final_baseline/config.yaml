@@ -18,7 +18,10 @@ forecast:
   #   ExtraTrees 가 전체 MAE 는 유의하게 낮지만(h60 -0.786 kw, CI[-1.007,-0.578])
   #   고사용량 구간 MAE 는 유의하게 악화(h45 +0.714, h60 +1.237) -> 사전 선언 조건 (c) 위반으로 기각.
   #   HistGBM 유지.
-  alert_model: extra_trees_isotonic   # 경보 분류기. 근거 33_model_compare_alert_clean.csv
+  # 경보 분류기 선정: 표준 분류모델 12종 비교(34_standard_benchmark_alert_clean.csv) 중
+  #   RandomForest 가 F1 0.512 / MCC 0.510 으로 최고. 클래스 가중은 악화되어 사용 안 함.
+  #   isotonic 보정은 함께 산출하되 Brier 가 악화되어 채택하지 않는다.
+  alert_model: random_forest
   eval_baselines: [persistence, ridge, rf, hgb]
 
 external:

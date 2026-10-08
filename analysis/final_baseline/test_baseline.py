@@ -163,11 +163,13 @@ def t_sequential_and_probability():
     ok("조기·확인 단계가 동일 목표시각 T 를 가리킴")
     pb = _pd.read_csv(TAB / "28_peak_probability_summary.csv", encoding="utf-8-sig")
     cl = pb[(pb.window == "clean_Jul_Sep") & (pb.horizon_min == 60)].set_index("score")
-    main, raw = "ET_clf_isotonic(main)", "ET_clf_uncalibrated"
-    assert cl.loc[main, "brier"] <= cl.loc[raw, "brier"] + 1e-9
-    assert cl.loc[main, "ece"] <= cl.loc[raw, "ece"] + 1e-9
-    ok(f"isotonic 보정이 Brier/ECE 개선 ({cl.loc[main,'brier']:.4f}/{cl.loc[main,'ece']:.4f} "
-       f"vs {cl.loc[raw,'brier']:.4f}/{cl.loc[raw,'ece']:.4f})")
+    main, iso = "RF_clf(main)", "RF_clf_isotonic"
+    assert cl.loc[main, "brier"] <= cl.loc["prior_constant", "brier"] + 1e-9
+    ok(f"주 모델 Brier 가 사전확률보다 낮음 ({cl.loc[main,'brier']:.4f} vs "
+       f"{cl.loc['prior_constant','brier']:.4f})")
+    better = "isotonic 개선" if cl.loc[iso, "brier"] < cl.loc[main, "brier"] else "isotonic 미개선(미채택)"
+    ok(f"보정 비교 기록: {better} — raw {cl.loc[main,'brier']:.4f}/{cl.loc[main,'ece']:.4f} "
+       f"vs isotonic {cl.loc[iso,'brier']:.4f}/{cl.loc[iso,'ece']:.4f}")
     assert cl.loc[main, "f1"] > cl.loc["prior_constant", "f1"]
     assert cl.loc[main, "pr_auc"] > cl.loc["persistence_rule_margin", "pr_auc"]
     ok("보정 확률이 사전확률·persistence 규칙 베이스라인을 상회")
