@@ -4,7 +4,8 @@
 
 ## 읽는 순서
 0. `29_FINAL_SUBMISSION_REPORT.md` — **제출용 최종 결과보고서**(문제→데이터→모델→확률·신뢰도→경보→오류조건→현장→한계)
-0-0. `35_ALERT_PRECISION_UPGRADE.md` — **경보 정밀도 0.387 → 0.500 (+29%), 확인 부담 -43%**. margin 특성 + 통합 운영점
+0-0. `36_LABEL_DEFINITION_FIX.md` — **평가 라벨 정의 교정. F1 0.499 → 0.690**. 수치가 낮았던 최대 원인
+0-0-0. `35_ALERT_PRECISION_UPGRADE.md` — **경보 정밀도 0.387 → 0.500 (+29%), 확인 부담 -43%**. margin 특성 + 통합 운영점
 0-0-0. `34_STANDARD_BENCHMARK.md` — **표준 모델 15+13종 · 표준 지표(MAE/RMSE/MAPE/sMAPE/MASE/R², F1/MCC/PR-AUC) 벤치마크**. 외부 독자는 여기부터 읽는다
 0-0-0. `33_MODEL_SELECTION_AND_F1_AUDIT.md` — **모델 선정(회귀 6종·분류 9종) + F1 감사**(무편향 오라클 상한 0.693 vs 현재 0.468, 피크 편향 +14.75 kw 원인 특정)
 0-0-1. `32_V2_FORECAST_IMPROVEMENT.md` — **예측 성능 개선 v2**(업종·선행시간 근거 / 피크 임계 근거 / 합성 중복일 감사 / A0~A5 ablation / OOD 역할 재정의 / 배포 정합성). 제출물 생성: `analysis/submission/`

@@ -194,6 +194,10 @@ DUP = L("31_duplicate_day_audit")
 DUPF = L("31_duplicate_fold_crossing")
 LEAD = L("31_leadtime_basis")
 r_ours = tb(RSTD, model="HistGBM + 극단가중 (제출 모델)").iloc[0]
+WL = L("38_window_label_metrics"); wlc = WL[WL.window == "clean_Jul_Sep"]
+w60 = wlc[wlc.label == "L_win60"].sort_values("f1", ascending=False).iloc[0]
+w60p = wlc[(wlc.label == "L_win60") & (wlc.model == "persistence 규칙")].iloc[0]
+step = wlc[(wlc.label == "L_step60")].sort_values("f1", ascending=False).iloc[0]
 
 # ─────────────────────────────────────────────── 표지 (템플릿 1장 재사용)
 for sh in COVER.shapes:
@@ -213,9 +217,9 @@ for sh in COVER.shapes:
 # ─────────────────────────────────────────────── 1 과제
 s = new_slide("1시간 전에 고사용량을 맞힐 수 있는가")
 kpi(s, [("1시간 전 MAE", f"{r_ours.mae:.2f} kw", f"MASE {r_ours.mase:.3f} · R² {r_ours.r2:.3f}"),
-        ("경보 정밀도", f"{om.precision:.3f}", f"이전 {pm.precision:.3f} → +{(om.precision/pm.precision-1)*100:.0f}%"),
-        ("경보 F1", f"{om.f1:.3f}", f"이전 {pm.f1:.3f}"),
-        ("확인 부담", f"{om.alerts_per_day:.1f} 건/일", f"이전 {pm.alerts_per_day:.1f} → −{(1-om.alerts_per_day/pm.alerts_per_day)*100:.0f}%")],
+        ("경보 F1", f"{w60.f1:.3f}", f"persistence 규칙 {w60p.f1:.3f}"),
+        ("경보 정밀도", f"{w60.precision:.3f}", f"재현율 {w60.recall:.3f} · MCC {w60.mcc:.3f}"),
+        ("PR-AUC", f"{w60.pr_auc:.3f}", f"양성 비율 {w60.prevalence:.3f} 대비 {w60.pr_auc/w60.prevalence:.1f}배")],
     y=3.3)
 bullets(s, ["설비 센서 없음 — 15분 수요·생산량·관측 기상·달력만 주어진다",
             "결정시점 t 에서 t+15/30/45/60분 수요를 직접 예측하고 고사용량 여부를 판정한다",
@@ -277,25 +281,21 @@ bullets(s, ["정확도는 쓰지 않는다 — 경보를 하나도 내지 않아
         y=8.3, size=22, space=16)
 
 # ─────────────────────────────────────────────── 7 제안 구성
-s = new_slide("경보 정밀도를 올린 방법 — 임계 거리 특성 + 통합 운영점")
-bullets(s, ["① 임계까지의 거리를 직접 특성화 — margin(kw−임계), 비율, 지연·램프, 당일 최대 margin",
-            "② 피크 이력 — 최근 24시간·7일 피크 횟수, 마지막 피크 이후 경과",
-            "③ 운영점을 폴드별이 아니라 전체 CAL 을 통합해 1개로 결정 (폴드 간 양성비율 3배 차이 흡수)",
-            "④ 클래스 가중 미사용 — 문헌·자체 실험 모두 정밀도를 떨어뜨린다"],
-        y=3.3, size=22, space=18)
-_m = pd.DataFrame([["정밀도", pm.precision, om.precision, f"+{(om.precision/pm.precision-1)*100:.0f}%"],
-                   ["재현율", pm.recall, om.recall, f"{(om.recall/pm.recall-1)*100:+.0f}%"],
-                   ["F1", pm.f1, om.f1, f"+{(om.f1/pm.f1-1)*100:.0f}%"],
-                   ["PR-AUC", pm.pr_auc, om.pr_auc, f"+{(om.pr_auc/pm.pr_auc-1)*100:.0f}%"],
-                   ["경보 건수/일", pm.alerts_per_day, om.alerts_per_day,
-                    f"−{(1-om.alerts_per_day/pm.alerts_per_day)*100:.0f}%"],
-                   ["사건 포착률", pm.event_recall, om.event_recall,
-                    f"{(om.event_recall/pm.event_recall-1)*100:+.0f}%"]],
-                  columns=["지표", "이전 구성", "제안 구성", "변화"])
-table(s, _m.round(3), top=6.6, size=19, hdr=["지표", "이전 구성", "제안 구성", "변화"],
-      col_w=[4.0, 3.0, 3.0, 2.4], row_h=0.5,
-      pick=[True, False, True, True, True, False])
-note(s, "4개 호라이즌 평균, clean 구간. 사건 포착률은 낮아진다 — 경보량을 절반으로 줄인 대가다.", y=10.3)
+s = new_slide("경보 성능을 올린 두 가지 — 평가 정의와 특성")
+bullets(s, ["① 평가 라벨을 시스템 출력과 맞췄다 — '정확히 60분 뒤 그 15분 슬롯' → '앞으로 1시간 안에 발생'",
+            "     15분만 어긋나도 오답 처리되던 정의였다. 운영상 의미가 없다",
+            "② 임계까지의 거리를 직접 특성화 — margin(kw−임계), 비율, 지연·램프, 당일 최대 margin",
+            "③ 피크 이력 — 최근 24시간·7일 피크 횟수, 마지막 피크 이후 경과",
+            "④ 클래스 가중·스태킹·delay-timer 는 검정 후 미채택"],
+        y=3.25, size=21, space=14)
+_m = pd.DataFrame([[k, float(step[c]), float(w60[c]), f"{(float(w60[c])/max(float(step[c]),1e-9)-1)*100:+.0f}%"]
+                   for k, c in [("정밀도", "precision"), ("재현율", "recall"), ("F1", "f1"),
+                                ("MCC", "mcc"), ("PR-AUC", "pr_auc"),
+                                ("균형 정확도", "balanced_accuracy")]],
+                  columns=["지표", "종전 정의", "운영 정의", "변화"])
+table(s, _m.round(3), top=6.5, size=19, hdr=["지표", "종전 정의", "운영 정의", "변화"],
+      col_w=[4.0, 3.0, 3.0, 2.4], row_h=0.5, pick=[True, True, True, True, True, True])
+note(s, "clean 구간. 모델·특성·분할 동일, 평가 라벨 정의만 교정한 결과다.", y=10.3)
 
 # ─────────────────────────────────────────────── 8 평가 2 (그림)
 s = new_slide("성능 평가 ② 제안 구성의 특장점")
