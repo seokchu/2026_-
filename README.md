@@ -44,6 +44,33 @@ v2 에서 바꾼 것: 잔차 타깃(`y−kw(t)`) · 푸리에 주기 인코딩 �
 근거: [`analysis/reports/32_V2_FORECAST_IMPROVEMENT.md`](analysis/reports/32_V2_FORECAST_IMPROVEMENT.md),
 표 `analysis/tables/31_*.csv`.
 
+
+## 경보 성능 — 숨기지 않고 적는 수치 (clean 7~9월, h60)
+
+| 기준 | F1 |
+|---|---:|
+| 사전확률(모두 경보) | 0.111 |
+| persistence 규칙 | 0.305 |
+| 회귀 마진(점예측 그대로) | 0.322 |
+| 이전 주 모델 HGB | 0.434 |
+| **현재 ExtraTrees+isotonic** | **0.468** (h15 0.538) |
+| 무편향 오라클 상한 | 0.693 |
+| 완전 예측 | 1.000 |
+
+사건 단위 recall **0.903** (186 사건 중 168).
+**상한의 68% 지점이다. 좋다고 말하지 않는다.**
+원인은 고사용량 구간의 체계적 과소예측 **+14.75 kw** — 고사용량 스텝의 81.6%에서 점예측이 임계 미달.
+ROC-AUC 0.934 는 발생률 5.96%에서 과대평가되므로 근거로 쓰지 않는다.
+근거: [`analysis/reports/33_MODEL_SELECTION_AND_F1_AUDIT.md`](analysis/reports/33_MODEL_SELECTION_AND_F1_AUDIT.md)
+
+## 모델 선정 (대회 요건: 베이스라인 포함 2개 이상 비교)
+
+- **수치 예측** 6종 비교(persistence / Ridge / RandomForest / ExtraTrees / HistGBM / HistGBM-deep)
+  → ExtraTrees 가 전체 MAE 는 유의 개선이나 **고사용량 MAE 유의 악화(h60 +1.237, CI [+0.515, +1.911])**
+  → 사전 선언 조건 위반으로 **기각**, HistGBM 유지
+- **고사용량 경보** 9종 비교 → **ExtraTrees(balanced)+isotonic 채택** (F1 0.481, 사건 recall 0.903, 11.1건/일 ≤ 용량 12)
+- 표: `33_model_compare_regression.csv`, `33_model_compare_alert_clean.csv`, `33_model_selection_verdict.csv`, `33_f1_ceiling_diagnosis.csv`
+
 ## 제출물 생성
 
 ```bash

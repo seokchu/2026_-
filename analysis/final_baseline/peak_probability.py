@@ -17,7 +17,8 @@ sys.path.insert(0, str(HERE)); sys.path.insert(0, str(ROOT / "analysis"))
 sys.path.insert(0, str(ROOT / "analysis" / "07_sparse_fems"))
 from common import save_table, fig_path, mpl                              # noqa: E402
 import features as FT, models as MD                                       # noqa: E402
-from sklearn.ensemble import HistGradientBoostingClassifier, RandomForestClassifier  # noqa: E402
+from sklearn.ensemble import (HistGradientBoostingClassifier, RandomForestClassifier,  # noqa: E402
+                              ExtraTreesClassifier)
 from sklearn.isotonic import IsotonicRegression                           # noqa: E402
 from sklearn.model_selection import TimeSeriesSplit                       # noqa: E402
 from sklearn.metrics import (average_precision_score, roc_auc_score, f1_score,
@@ -74,14 +75,21 @@ for h in H:
         ytr, yca, yte = lab[tr], lab[ca], lab[te]
         if ytr.sum() < 20 or yca.sum() < 5:
             continue
-        # --- 주 모델: HGB 분류기 + CAL isotonic 보정
-        clf = HistGradientBoostingClassifier(random_state=SEED).fit(Xtr, ytr)
-        p_ca_raw, p_te_raw = clf.predict_proba(Xca)[:, 1], clf.predict_proba(Xte)[:, 1]
+        # --- 주 모델: ExtraTrees(class_weight=balanced) + CAL isotonic 보정
+        #     선정 근거: 33_model_compare_alert_clean.csv — 경보 용량 제약 하 clean F1 최대
+        et = ExtraTreesClassifier(n_estimators=400, min_samples_leaf=2,
+                                  class_weight="balanced", n_jobs=-1,
+                                  random_state=SEED).fit(Xtr, ytr)
+        p_ca_raw, p_te_raw = et.predict_proba(Xca)[:, 1], et.predict_proba(Xte)[:, 1]
         iso = IsotonicRegression(out_of_bounds="clip").fit(p_ca_raw, yca)
         p_te_cal = iso.predict(p_te_raw)
         p_ca_cal = iso.predict(p_ca_raw)
         # --- 베이스라인
-        rf = RandomForestClassifier(n_estimators=200, min_samples_leaf=2, n_jobs=-1,
+        clf = HistGradientBoostingClassifier(random_state=SEED).fit(Xtr, ytr)
+        p_ca_hgb, p_te_hgb = clf.predict_proba(Xca)[:, 1], clf.predict_proba(Xte)[:, 1]
+        # 비교 공정성: 33_model_compare 와 동일 설정(400 트리, class_weight 균형)
+        rf = RandomForestClassifier(n_estimators=400, min_samples_leaf=2, n_jobs=-1,
+                                    class_weight="balanced_subsample",
                                     random_state=SEED).fit(Xtr, ytr)
         p_te_rf = rf.predict_proba(Xte)[:, 1]
         reg = MD.point_model("hgb", SEED).fit(Xtr, d.iloc[tr][ycol].values)
@@ -92,8 +100,9 @@ for h in H:
         prior = float(ytr.mean())
 
         cands = {
-            "HGB_clf_isotonic(main)": (p_ca_cal, p_te_cal, True),
-            "HGB_clf_uncalibrated": (p_ca_raw, p_te_raw, True),
+            "ET_clf_isotonic(main)": (p_ca_cal, p_te_cal, True),
+            "ET_clf_uncalibrated": (p_ca_raw, p_te_raw, True),
+            "HGB_clf_uncalibrated": (p_ca_hgb, p_te_hgb, True),
             "RF_clf_uncalibrated": (rf.predict_proba(Xca)[:, 1], p_te_rf, True),
             "regression_margin_score": (s_ca_reg, s_te_reg, False),
             "persistence_rule_margin": (s_ca_pers, s_te_pers, False),
@@ -154,7 +163,7 @@ print(cl[["horizon_min", "score", "prevalence", "pr_auc", "f1", "precision", "re
 
 fig, axes = plt.subplots(1, 2, figsize=(11, 3.8))
 rc = pd.DataFrame(rel_rows)
-for name, mk in [("HGB_clf_isotonic(main)", "o-"), ("HGB_clf_uncalibrated", "s--")]:
+for name, mk in [("ET_clf_isotonic(main)", "o-"), ("ET_clf_uncalibrated", "s--")]:
     s = rc[(rc.score == name) & (rc.horizon_min == 60)].groupby("bin").agg(
         mean_pred=("mean_pred", "mean"), observed_rate=("observed_rate", "mean")).reset_index()
     axes[0].plot(s.mean_pred, s.observed_rate, mk, label=name, ms=4)
@@ -164,12 +173,12 @@ axes[0].set_title("신뢰도 곡선 (h60, 원본구간)"); axes[0].legend(fontsi
 x = np.arange(len(cl.score.unique()))
 for i, hm in enumerate([15, 60]):
     s = cl[cl.horizon_min == hm].set_index("score").reindex(
-        ["HGB_clf_isotonic(main)", "HGB_clf_uncalibrated", "RF_clf_uncalibrated",
+        ["ET_clf_isotonic(main)", "ET_clf_uncalibrated", "HGB_clf_uncalibrated", "RF_clf_uncalibrated",
          "regression_margin_score", "persistence_rule_margin", "prior_constant"])
     axes[1].bar(x + (i - .5) * .4, s.f1.values, .4, label=f"h{hm}")
 axes[1].set_xticks(x); axes[1].set_xticklabels(
-    ["HGB+iso", "HGB raw", "RF", "회귀여유", "persistence", "사전확률"], rotation=20,
-    ha="right", fontsize=6)
+    ["ET+iso(main)", "ET raw", "HGB", "RF", "회귀여유", "persistence", "사전확률"],
+    rotation=20, ha="right", fontsize=6)
 axes[1].set_ylabel("F1"); axes[1].legend(fontsize=7); axes[1].set_title("분류 베이스라인 비교 (원본구간)")
 fig.suptitle("FIGURE 7. 운영상 피크 초과 확률 — 보정과 분류 성능 (고장·과금 확률 아님)", fontsize=9)
 fig.tight_layout(); fig.savefig(fig_path("28_peak_probability")); plt.close(fig)

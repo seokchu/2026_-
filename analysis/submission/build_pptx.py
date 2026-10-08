@@ -124,6 +124,12 @@ OODD = load("31_ood_decile_curve")
 OODB = load("31_ood_weight_bootstrap")
 STR = load("31_v2_stress_map")
 ABL = load("31_v2_ablation_summary")
+MCR = load("33_model_compare_regression")
+MSC = load("33_select_regression_clean")
+MSB = load("33_select_regression_bootstrap")
+MCA = load("33_model_compare_alert_clean")
+FDG = load("33_f1_ceiling_diagnosis")
+PKP = load("28_peak_probability_summary")
 
 a0 = tb(V2, variant="A0_baseline", horizon_min=60).iloc[0]
 a5 = tb(V2, variant="A5_all", horizon_min=60).iloc[0]
@@ -149,9 +155,17 @@ for i, line in enumerate([
     p.runs[0].font.size = Pt(17 if i < 2 else 13)
     p.runs[0].font.color.rgb = SUB if i < 2 else ACC
     p.runs[0].font.name = FONT
-note(s, f"핵심 결과 — h60 MAE {a0.mae:.3f} → {a5.mae:.3f} kw ({a5.mae_vs_A0_pct:+.1f}%), "
-        f"고사용량 구간 MAE {a0.mae_peak:.3f} → {a5.mae_peak:.3f} kw ({a5.maepeak_vs_A0_pct:+.1f}%)",
+_pk60 = tb(PKP, window="clean_Jul_Sep", horizon_min=60).set_index("score")
+_f1_now = float(_pk60.loc["ET_clf_isotonic(main)", "f1"])
+_f1_pers = float(_pk60.loc["persistence_rule_margin", "f1"])
+_f1_ceil = float(FDG[FDG.model == "R4_hist_gbm"].oracle_f1_same_error.iloc[0])
+_evrec = float(tb(MCA, model="C5_extra_trees").event_recall.iloc[0])
+note(s, f"수치 예측 — h60 MAE {a0.mae:.3f} → {a5.mae:.3f} kw ({a5.mae_vs_A0_pct:+.1f}%), "
+        f"고사용량 구간 {a0.mae_peak:.3f} → {a5.mae_peak:.3f} kw ({a5.maepeak_vs_A0_pct:+.1f}%)",
      ACC, top=4.35)
+note(s, f"고사용량 경보 — F1 {_f1_now:.3f} (persistence 규칙 {_f1_pers:.3f}, "
+        f"무편향 오라클 상한 {_f1_ceil:.3f}) · 사건 recall {_evrec:.3f}",
+     WARN, top=4.75)
 
 # ─────────────────────────────────────────────── S2 문제 정의
 s = slide("무엇을 푸는가", "설비 센서가 없는 공장. 가진 것은 15분 수요·생산량·관측 날씨·달력뿐이다.")
@@ -263,6 +277,79 @@ bb = V2B[V2B.scope.isin(["ALL", "peak_only"])][["horizon_min", "scope", "delta_m
 table(s, bb.round(3), top=3.8, width=11.6, size=11,
       hdr=["선행(분)", "범위", "MAE 차(A5-A0)", "95% CI 하한", "95% CI 상한", "개선 유의"])
 note(s, "일 단위 블록 부트스트랩 1,000회(시간 상관 보정). 8개 비교 전부 CI 상한 < 0 — 우연이 아니다.", ACC)
+
+
+# ─────────────────────────────────────────────── S8b 회귀 모델 비교·선정
+s = slide("제2장 · 모델 비교 ① 수치 예측 — 베이스라인 포함 6종",
+          "전부 동일 조건(동일 fold·적합집합·v2 레시피). 전 구간 OOF, h60")
+_r = MCR[MCR.horizon_min == 60][["model", "mae", "rmse", "mae_peak", "bias_peak", "err_p95"]].copy()
+RN = {"R0_persistence": "직전값 지속 (베이스라인)", "R1_ridge": "Ridge (베이스라인)",
+      "R2_random_forest": "RandomForest", "R3_extra_trees": "ExtraTrees",
+      "R4_hist_gbm": "HistGBM ★현행", "R5_hist_gbm_deep": "HistGBM-deep"}
+_r["model"] = _r.model.map(RN)
+table(s, _r.round(3), top=1.6, width=12.0, size=12,
+      hdr=["모델 (h60)", "MAE", "RMSE", "고사용량 MAE", "고사용량 편향", "오차 p95"])
+bullets(s, [
+    (0, "사전 선언 선정 규칙: (a) 4개 horizon 전부 MAE 악화 없음 AND (b) h60 블록 부트스트랩 CI 상한<0 AND (c) 고사용량 MAE 악화 없음"),
+    (0, "ExtraTrees — (a)(b) 충족, (c) 위반 → 기각"),
+    (1, "전체 MAE 는 h60 −0.786 kw (CI [−1.007, −0.578]) 로 유의 개선"),
+    (1, "그러나 고사용량 구간 MAE 는 h45 +0.714 (CI [+0.043, +1.395]), h60 +1.237 (CI [+0.515, +1.911]) 로 유의 악화"),
+    (0, "평균 오차를 사는 대신 정작 맞혀야 할 구간을 깎는다 → 받아들이지 않는다. HistGBM 유지"),
+], top=4.0, height=2.6, size=13.5)
+
+# ─────────────────────────────────────────────── S8c 경보 모델 비교·선정
+s = slide("제2장 · 모델 비교 ② 고사용량 경보 — 베이스라인 포함 9종",
+          "clean_Jul_Sep, h60, OOF 7,288 스텝 / 419 양성 / 186 사건")
+CN2 = {"C5_extra_trees": "ExtraTrees(balanced) ★선정", "C6_hist_gbm": "HistGBM",
+       "C2_quantile90_margin": "분위회귀 q0.90 마진", "C3_logistic": "Logistic (베이스라인)",
+       "C4_random_forest": "RandomForest", "C0_persistence_rule": "persistence 규칙 (베이스라인)",
+       "C1_reg_margin": "회귀 마진 (현행 점예측)", "C7_stacked": "스태킹",
+       "C8_stacked_isotonic": "스태킹+isotonic"}
+_c = MCA[["model", "f1", "precision", "recall", "event_recall", "alerts_per_day", "tp", "fp", "fn"]].copy()
+_c["model"] = _c.model.map(CN2)
+table(s, _c.round(3), top=1.6, width=12.2, size=11,
+      hdr=["모델", "F1", "정밀도", "재현율", "사건 recall", "경보/일", "TP", "FP", "FN"])
+note(s, "선정 규칙(제약은 실험 이전부터 config 에 있던 operator_advisory_capacity=12): "
+        "경보 12건/일 이하 후보 중 clean F1 최대, 동점 시 사건 recall. "
+        "HistGBM 은 12.4건/일로 용량 초과. 스태킹은 전 구간 F1 0.477 이었으나 clean 에서 0.251 로 붕괴(중복일 과적합) → 기각.",
+     WARN, top=6.6)
+
+# ─────────────────────────────────────────────── S8d F1 감사
+s = slide("제3장 · F1 감사 — 0.47 은 한계인가 결함인가",
+          "같은 크기의 오차를 '편향 없이' 가졌을 때의 F1 상한을 측정했다")
+_d = FDG[["model", "mae", "bias_all", "bias_peak", "peak_pred_above_thr", "oracle_f1_same_error"]].copy()
+_d["model"] = _d.model.map(RN)
+table(s, _d.round(3), left=0.65, top=1.6, width=6.6, size=10,
+      hdr=["모델", "MAE", "전체 편향", "고사용량 편향", "피크 중 임계초과", "오라클 F1"])
+bullets(s, [
+    (0, "결함이다. 본질적 한계가 아니다"),
+    (1, f"현재 F1 {_f1_now:.3f} vs 무편향 오라클 {_f1_ceil:.3f} — 격차 {_f1_ceil-_f1_now:.3f}"),
+    (0, "원인: 고사용량 구간에서만 +14.75 kw 과소예측"),
+    (1, "전체 편향은 −0.96 kw 로 거의 0 인데 피크에서만 치우친다"),
+    (1, "고사용량 스텝의 81.6% 는 점예측이 임계선에 도달조차 못 한다"),
+    (0, "MAE 를 최소화하면 조건부 평균으로 수렴 → 분포 오른쪽 꼬리를 구조적으로 깎는다"),
+    (1, "MAE 가 좋아져도 F1 이 따라오지 않는 이유"),
+    (0, "라벨의 59.2% 가 임계선 ±MAE 이내 — 경계 밀집. 단, 오라클이 이를 포함하고도 0.69"),
+], left=7.5, top=1.7, width=5.3, size=12.5)
+
+# ─────────────────────────────────────────────── S8e 솔직한 현재 위치
+s = slide("제3장 · 지금 수준을 솔직하게 적으면", "clean_Jul_Sep, h60")
+_pos = pd.DataFrame([
+    ["사전확률(모두 경보)", f"{float(_pk60.loc['prior_constant','f1']):.3f}", "하한"],
+    ["persistence 규칙", f"{_f1_pers:.3f}", "단순 규칙"],
+    ["회귀 마진(현행 점예측)", f"{float(tb(MCA, model='C1_reg_margin').f1.iloc[0]):.3f}", "점예측을 그대로 경보에 쓸 때"],
+    ["이전 주 모델 HGB+isotonic", f"{float(_pk60.loc['HGB_clf_uncalibrated','f1']):.3f}", "교체 전"],
+    ["현재 ET+isotonic", f"{_f1_now:.3f}", "persistence 대비 +53%, 사전확률 대비 4.2배"],
+    ["무편향 오라클", f"{_f1_ceil:.3f}", "같은 오차 크기, 편향만 제거 — 남은 여지"],
+    ["완전 예측", "1.000", "—"],
+], columns=["기준", "F1", "의미"])
+table(s, _pos, top=1.6, width=11.6, size=12.5)
+bullets(s, [
+    (0, "'처참' 까지는 아니지만 좋다고 말할 수도 없다 — 상한의 68% 지점"),
+    (0, f"사건 단위로 보면 186 사건 중 168 포착(사건 recall {_evrec:.3f}). 스텝 F1 과 다른 질문에 답한다 — 섞지 않는다"),
+    (0, "ROC-AUC 0.934 는 발생률 5.96% 에서 과대평가된다. 성능 근거로 쓰지 않는다"),
+    (0, "다음: 피크 편향 직접 제거(높은 분위 점예측 / 비대칭 손실) · 사건 단위 임계 최적화 — 사전 채택조건 선언 후 검정"),
+], top=4.3, height=2.3, size=13)
 
 # ─────────────────────────────────────────────── S9 오류분석
 s = slide("제3장 · 오류분석 — 어디서 잘 되고 어디서 깨지는가",

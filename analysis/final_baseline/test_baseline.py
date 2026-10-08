@@ -163,7 +163,7 @@ def t_sequential_and_probability():
     ok("조기·확인 단계가 동일 목표시각 T 를 가리킴")
     pb = _pd.read_csv(TAB / "28_peak_probability_summary.csv", encoding="utf-8-sig")
     cl = pb[(pb.window == "clean_Jul_Sep") & (pb.horizon_min == 60)].set_index("score")
-    main, raw = "HGB_clf_isotonic(main)", "HGB_clf_uncalibrated"
+    main, raw = "ET_clf_isotonic(main)", "ET_clf_uncalibrated"
     assert cl.loc[main, "brier"] <= cl.loc[raw, "brier"] + 1e-9
     assert cl.loc[main, "ece"] <= cl.loc[raw, "ece"] + 1e-9
     ok(f"isotonic 보정이 Brier/ECE 개선 ({cl.loc[main,'brier']:.4f}/{cl.loc[main,'ece']:.4f} "

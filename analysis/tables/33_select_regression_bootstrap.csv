@@ -1,0 +1,9 @@
+﻿window,horizon_min,scope,n,comparison,delta_mae,ci_lo,ci_hi,improves
+clean_Jul_Sep,15,ALL,7288,R3_extra_trees - R4_hist_gbm,-0.256952311112751,-0.3393806181073277,-0.17754160929188967,True
+clean_Jul_Sep,15,peak_only,419,R3_extra_trees - R4_hist_gbm,-0.3128761845221865,-0.8759485544736951,0.21991985025329477,False
+clean_Jul_Sep,30,ALL,7288,R3_extra_trees - R4_hist_gbm,-0.7981731584871428,-1.0364291602612654,-0.5715692227834517,True
+clean_Jul_Sep,30,peak_only,418,R3_extra_trees - R4_hist_gbm,0.4095463671179541,-0.48061715431969815,1.1984583726525877,False
+clean_Jul_Sep,45,ALL,7288,R3_extra_trees - R4_hist_gbm,-0.8875696392168934,-1.1090540424320425,-0.6675847837154514,True
+clean_Jul_Sep,45,peak_only,418,R3_extra_trees - R4_hist_gbm,0.7142571880447015,0.043317062296294395,1.394583044426941,False
+clean_Jul_Sep,60,ALL,7288,R3_extra_trees - R4_hist_gbm,-0.7856240756778989,-1.0069197317648422,-0.5778945939597319,True
+clean_Jul_Sep,60,peak_only,419,R3_extra_trees - R4_hist_gbm,1.2365908801381804,0.5146304588416716,1.9108502693435871,False

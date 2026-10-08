@@ -17,6 +17,8 @@ STEPS = [
     ("v2_clean",  f"{FB}/v2_clean_summary.py",   "표 31_v2_clean_*, 31_duplicate_fold_crossing"),
     ("v2_ood",    f"{FB}/v2_stress_robust.py",   "표 31_ood_*"),
     ("leadtime",  f"{FB}/leadtime_basis.py",     "표 31_industry/leadtime/tariff 근거"),
+    ("v3_compare", f"{FB}/v3_model_selection.py", "표 33_model_compare_* (모델 비교·F1 진단, 느림)"),
+    ("v3_verdict", f"{FB}/v3_select_verdict.py", "표 33_select_*, 33_model_selection_verdict"),
     ("peakprob",  f"{FB}/peak_probability.py",   "표 28_peak_probability_*, FIG 7"),
     ("seqpolicy", f"{FB}/sequential_policy.py",  "표 28_sequential_*, FIG 8"),
     ("errcond",   f"{FB}/error_conditions.py",   "표 28_error_conditions_*, FIG 9"),
@@ -30,7 +32,7 @@ STEPS = [
     ("report",    f"{SUB}/build_report.py",      "결과보고서 .hwpx"),
     ("pptx",      f"{SUB}/build_pptx.py",        "발표자료 .pptx"),
 ]
-SLOW = {"statemodel", "v2_ablate"}
+SLOW = {"statemodel", "v2_ablate", "v3_compare"}
 
 t0 = time.time()
 fail = []

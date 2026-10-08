@@ -13,6 +13,12 @@ forecast:
   # v2 점예측 레시피: 잔차타깃(y-kw_t) + SERA 계열 극단가중 + 주기인코딩 + 휴무/재가동 특성
   # 근거: analysis/tables/31_v2_clean_summary.csv, 31_v2_clean_bootstrap.csv (A5 vs A0)
   point_recipe: v2_a5         # 'v1' 로 두면 종전(수준타깃·무가중) 동작
+  # 모델 선정 근거: analysis/tables/33_model_compare_regression.csv, 33_model_selection_verdict.csv
+  #   후보 6종(persistence / Ridge / RandomForest / ExtraTrees / HistGBM / HistGBM-deep) 동일 조건 비교.
+  #   ExtraTrees 가 전체 MAE 는 유의하게 낮지만(h60 -0.786 kw, CI[-1.007,-0.578])
+  #   고사용량 구간 MAE 는 유의하게 악화(h45 +0.714, h60 +1.237) -> 사전 선언 조건 (c) 위반으로 기각.
+  #   HistGBM 유지.
+  alert_model: extra_trees_isotonic   # 경보 분류기. 근거 33_model_compare_alert_clean.csv
   eval_baselines: [persistence, ridge, rf, hgb]
 
 external:
