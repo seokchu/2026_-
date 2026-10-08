@@ -39,3 +39,13 @@ analysis/tables/31_v2_oof_rows.csv
 # 제출 패키지(원시 학습데이터 포함) — 로컬에서만 생성한다.
 submission/*.zip
 submission/test_predictions.csv
+
+# 경보 실험 행 단위 점수 파일 (수십 MB) — 해당 스크립트 재실행으로 재생성.
+analysis/tables/35_alert_upgrade_rows_detail.csv
+analysis/tables/35_feature_ablation_scores.csv
+analysis/tables/35_final_alert_scores.csv
+analysis/tables/35_opselect_scores.csv
+analysis/tables/36_alert_final_scores.csv
+
+# PowerPoint 임시 잠금 파일
+submission/~$*

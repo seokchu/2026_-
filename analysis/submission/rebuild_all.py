@@ -20,6 +20,11 @@ STEPS = [
     ("v3_compare", f"{FB}/v3_model_selection.py", "표 33_model_compare_* (모델 비교·F1 진단, 느림)"),
     ("v3_verdict", f"{FB}/v3_select_verdict.py", "표 33_select_*, 33_model_selection_verdict"),
     ("v4_standard", f"{FB}/v4_standard_benchmark.py", "표 34_standard_benchmark_* (표준 모델·지표, 느림)"),
+    ("v5_upgrade", f"{FB}/v5_alert_upgrade.py", "표 35_alert_upgrade_* (경보 정밀도 실험)"),
+    ("v5b_ablate", f"{FB}/v5b_feature_ablation.py", "표 35_feature_ablation"),
+    ("v5d_opsel", f"{FB}/v5d_opselect.py", "표 35_opselect_metrics (운영점 규칙 비교)"),
+    ("alert_final", f"{FB}/alert_final.py", "표 36_alert_final_* (경보 최종 구성)"),
+    ("eval_figs", f"{FB}/eval_figures.py", "그림 37_eval1/37_eval2"),
     ("peakprob",  f"{FB}/peak_probability.py",   "표 28_peak_probability_*, FIG 7"),
     ("seqpolicy", f"{FB}/sequential_policy.py",  "표 28_sequential_*, FIG 8"),
     ("errcond",   f"{FB}/error_conditions.py",   "표 28_error_conditions_*, FIG 9"),
@@ -33,7 +38,7 @@ STEPS = [
     ("report",    f"{SUB}/build_report.py",      "결과보고서 .hwpx"),
     ("pptx",      f"{SUB}/build_pptx.py",        "발표자료 .pptx"),
 ]
-SLOW = {"statemodel", "v2_ablate", "v3_compare", "v4_standard"}
+SLOW = {"statemodel", "v2_ablate", "v3_compare", "v4_standard", "v5_upgrade", "v5b_ablate", "v5d_opsel"}
 
 t0 = time.time()
 fail = []

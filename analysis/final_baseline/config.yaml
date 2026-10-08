@@ -21,7 +21,10 @@ forecast:
   # 경보 분류기 선정: 표준 분류모델 12종 비교(34_standard_benchmark_alert_clean.csv) 중
   #   RandomForest 가 F1 0.512 / MCC 0.510 으로 최고. 클래스 가중은 악화되어 사용 안 함.
   #   isotonic 보정은 함께 산출하되 Brier 가 악화되어 채택하지 않는다.
-  alert_model: random_forest
+  # 경보 최종 구성(보고서 35): CORE 43 + margin 12 + 피크이력 3 특성, RandomForest(400),
+  #   폴드별 CAL isotonic, 운영점은 전 폴드 CAL 통합 확률 임계(R3).
+  #   클래스 가중·delay-timer·스태킹은 검정 후 미채택.
+  alert_model: random_forest_margin
   eval_baselines: [persistence, ridge, rf, hgb]
 
 external:

@@ -46,6 +46,10 @@ f1_ceil = float(FDG[FDG.model == "R4_hist_gbm"].oracle_f1_same_error.iloc[0])
 bias_pk = float(FDG[FDG.model == "R4_hist_gbm"].bias_peak.iloc[0])
 above = float(FDG[FDG.model == "R4_hist_gbm"].peak_pred_above_thr.iloc[0])
 win_c = MCA.sort_values("f1", ascending=False).iloc[0]
+AF = L("36_alert_final_metrics"); afc = AF[AF.window == "clean_Jul_Sep"]
+OURS_C, PREV_C = "제안 (margin 특성 + RF)", "이전 구성 (기본특성 + RF)"
+om = afc[afc.model == OURS_C].mean(numeric_only=True)
+pmv = afc[afc.model == PREV_C].mean(numeric_only=True)
 RNAME = {"R0_persistence": "직전값 지속(베이스라인)", "R1_ridge": "Ridge(베이스라인)",
          "R2_random_forest": "RandomForest", "R3_extra_trees": "ExtraTrees",
          "R4_hist_gbm": "HistGBM(현행)", "R5_hist_gbm_deep": "HistGBM-deep"}
@@ -197,6 +201,24 @@ C2 = [
  (2, f"선택: {CNAME[win_c.model]} (F1 {win_c.f1:.3f}, 사건 recall {win_c.event_recall:.3f}, {win_c.alerts_per_day:.1f}건/일). HistGBM 은 12.4건/일로 용량 제약 위반."),
  (3, "스태킹은 전 구간 F1 0.477 로 상위였으나 clean 구간에서 0.251 로 붕괴했다. 스태커가 중복일이 섞인 앞쪽 fold 에 과적합했다. 전 구간 수치만 봤다면 잘못 골랐을 것이다."),
  (2, f"주 분류기를 HistGBM+isotonic 에서 RandomForest+isotonic 으로 교체했다. clean h60 F1 {float(pk60.loc['HGB_clf_uncalibrated','f1']):.3f} → {f1_now:.3f}, Brier {float(pk60.loc['HGB_clf_uncalibrated','brier']):.4f} → {float(pk60.loc['RF_clf(main)','brier']):.4f}, ECE {float(pk60.loc['HGB_clf_uncalibrated','ece']):.4f} → {float(pk60.loc['RF_clf(main)','ece']):.4f}. h15 은 F1 {float(pk15.loc['RF_clf(main)','f1']):.3f}."),
+ (1, "경보 정밀도 업그레이드 — 임계 거리 특성 + 통합 운영점"),
+ (2, f"문제: 이전 구성의 정밀도가 {pmv.precision:.3f} 으로 낮았다. 경보 3건 중 2건이 헛경고이고 하루 {pmv.alerts_per_day:.1f}건을 확인해야 했다."),
+ (2, "대응 ① 임계까지의 거리를 직접 특성화했다 — margin(현재수요-임계), 비율, 지연 1/2/4/8/96, 램프, 이동 최대·평균, 당일 최대 margin."),
+ (2, "대응 ② 피크 이력 — 최근 24시간·7일 피크 횟수, 마지막 피크 이후 경과 스텝."),
+ (2, "대응 ③ 운영점을 폴드별이 아니라 전 폴드 CAL 을 통합해 확률 임계 1개로 결정했다. 폴드 간 양성 비율이 0.031~0.091 로 3배 차이나 폴드별 임계가 전이되지 않기 때문이다."),
+ (2, "대응 ④ 클래스 가중·리샘플링은 쓰지 않았다. 문헌과 자체 실험 모두 재현율을 올리고 정밀도를 낮춘다."),
+ (3, "산업 경보 표준 기법인 delay-timer(n-out-of-m)도 후보에 넣었으나 CAL 에서 선택되지 않았다. 본 데이터에서는 효과가 없었다."),
+] + [
+ (2, f"h{int(r.horizon_min)}: 정밀도 {afc[(afc.model==PREV_C)&(afc.horizon_min==r.horizon_min)].precision.iloc[0]:.3f} -> {r.precision:.3f}, "
+     f"F1 {afc[(afc.model==PREV_C)&(afc.horizon_min==r.horizon_min)].f1.iloc[0]:.3f} -> {r.f1:.3f}, "
+     f"경보 {afc[(afc.model==PREV_C)&(afc.horizon_min==r.horizon_min)].alerts_per_day.iloc[0]:.1f} -> {r.alerts_per_day:.1f}건/일")
+ for _, r in afc[afc.model == OURS_C].sort_values("horizon_min").iterrows()
+] + [
+ (2, f"4개 호라이즌 평균: 정밀도 {pmv.precision:.3f} -> {om.precision:.3f} (+{(om.precision/pmv.precision-1)*100:.0f}%), "
+     f"F1 {pmv.f1:.3f} -> {om.f1:.3f}, PR-AUC {pmv.pr_auc:.3f} -> {om.pr_auc:.3f}, "
+     f"확인 부담 {pmv.alerts_per_day:.1f} -> {om.alerts_per_day:.1f}건/일 (-{(1-om.alerts_per_day/pmv.alerts_per_day)*100:.0f}%)."),
+ (2, f"대가를 숨기지 않는다: 사건 포착률이 {pmv.event_recall:.3f} 에서 {om.event_recall:.3f} 로 낮아진다. 경보량을 절반으로 줄인 결과다."),
+ (3, "같은 경보 예산으로 맞추면 제안 구성의 스텝 단위 정밀도는 오히려 낮아진다. 즉 낮은 경보량 구간에서 더 정확한 모델이지 전 구간에서 우월한 모델이 아니다. 운영 모드를 정밀 모드(기본)와 포착 모드 두 가지로 제시한다."),
  (1, "최종 모델 선택 이유"),
  (2, "A5 를 최종 모델로 선택했다. 네 호라이즌 모두에서 MAE 와 고사용량 구간 MAE 가 동시에 개선되었고, 블록 부트스트랩으로 유의했으며, 개선의 출처가 네 가지 개별 요소로 분해되어 설명 가능하기 때문이다."),
  (2, "선택 규칙은 실험 전에 선언했다: '전 호라이즌에서 MAE 가 악화되지 않고 고사용량 구간 MAE 가 개선되며 블록 부트스트랩 CI 상한이 0 미만'. 돌려본 뒤 기준을 바꾸지 않았다."),
